@@ -1,9 +1,13 @@
 #include <SDL.h>
 #include <game.h>
 #include <gl/gl_loader.h>
-#include <glm/glm.hpp>
 #include <buffers.h>
 #include <shaders.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/transform.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <display.h>
 
 //----------------------------------------------------------
 
@@ -21,31 +25,33 @@ const float positions[] =
 //----------------------------------------------------------
 
 Game::Game()
-	: running(true)
+	: running(true),
+		model(1.0f)
 {
 }
 
 Game::~Game()
 {
 	glDeleteBuffers(1, &positionsBuffer);
-	glDeleteProgram(shader);
 	glDeleteVertexArrays(1, &vao);
 }
 
 bool Game::Init()
 {
+	display.cameraPos = glm::vec3(4,3,3);
 	glClearColor(0, 0, 1, 1);
 	return true;
 }
 
 bool Game::Load()
 {
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
-
-	NewVertexBuffer(sizeof(positions), positions, &positionsBuffer);
-
-	if (!NewShaderProgram("passthru.vs.glsl", "red.fs.glsl", &shader))
+	if (NewShaderProgram("simple.vs.glsl", "red.fs.glsl", &shader))
+	{
+		glGenVertexArrays(1, &vao);
+		glBindVertexArray(vao);
+		NewVertexBuffer(sizeof(positions), positions, &positionsBuffer);
+	}
+	else
 	{
 		running = false;
 	}
@@ -65,7 +71,10 @@ void Game::Render(float elapsedMS)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glUseProgram(shader);
+	glUseProgram(shader->id);
+	glm::mat4 temp = display.viewProjection * model;
+	glUniformMatrix4fv(shader->params[0].location, 1, GL_FALSE, &temp[0][0]);
+
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, positionsBuffer);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);

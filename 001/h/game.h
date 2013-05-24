@@ -1,7 +1,9 @@
 #if ! defined(__GAME_H__)
 #define __GAME_H__
 
+#include <glm/glm.hpp>
 #include <gl/gl_loader.h>
+#include <shaders.h>
 
 class Game
 {
@@ -20,7 +22,9 @@ private:
 	bool running;
 	GLuint vao;
 	GLuint positionsBuffer;
-	GLuint shader;
+	Shader shader;
+	glm::mat4 model;
+	GLuint mvp;
 };
 
 #endif __GAME_H__

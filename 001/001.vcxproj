@@ -130,10 +130,16 @@ echo Build post-step for $(ProjectName) complete.</Command>
   <ItemGroup>
     <ClInclude Include="h\buffers.h" />
     <ClInclude Include="h\debug.h" />
+    <ClInclude Include="h\display.h" />
     <ClInclude Include="h\game.h" />
     <ClInclude Include="h\gl\gl_core_4.2.h" />
     <ClInclude Include="h\gl\gl_loader.h" />
     <ClInclude Include="h\shaders.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\passthru.vs.glsl" />
+    <None Include="shaders\red.fs.glsl" />
+    <None Include="shaders\simple.vs.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

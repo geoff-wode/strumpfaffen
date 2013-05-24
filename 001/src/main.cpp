@@ -3,18 +3,24 @@
 #include <debug.h>
 #include <gl/gl_loader.h>
 #include <game.h>
+#include <display.h>
 
 //----------------------------------------------------------
 
-static void Init(int width, int height);
+static void InitSystem(int width, int height);
+
+//----------------------------------------------------------
+
+DisplayData display;
 
 //----------------------------------------------------------
 
 int main(int argc, char* argv[])
 {
-	Init(800, 600);
-
 	Game game;
+
+	InitSystem(display.width, display.height);
+
 	game.Init();
 	game.Load();
 
@@ -28,6 +34,8 @@ int main(int argc, char* argv[])
     previousTime = now;
 
 		game.Update(deltaMS);
+		display.Update();
+
 		if (game.IsRunning())
 		{
 			game.Render(deltaMS);
@@ -72,7 +80,7 @@ static void InitGL()
   glFrontFace(GL_CCW);
 }
 
-static void Init(int width, int height)
+static void InitSystem(int width, int height)
 {
 	SDL_Init(SDL_INIT_EVERYTHING);
 	atexit(SDL_Quit);

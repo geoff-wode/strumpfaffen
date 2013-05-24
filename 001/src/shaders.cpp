@@ -13,17 +13,58 @@ static bool LoadSourceFile(const std::string& filename, std::string& content);
 
 //----------------------------------------------------------
 
-bool NewShaderProgram(const std::string& vsSrc, const std::string& fsSrc, GLuint* program)
+const std::string commonCode(
+	"#version 330\n"
+	"uniform mat4 ModelViewProjection;\n"
+	);
+
+//----------------------------------------------------------
+
+bool NewShaderProgram(const std::string& vsSrc, const std::string& fsSrc, Shader* shader)
 {
+	Shader newShader(new ShaderData());
+
 	std::vector<GLuint> shaders;
 
 	shaders.push_back(CompileShader(GL_VERTEX_SHADER, vsSrc));
 	shaders.push_back(CompileShader(GL_FRAGMENT_SHADER, fsSrc));
 
-	const bool success = LinkProgram(shaders, program);
+	const bool success = LinkProgram(shaders, &newShader->id);
 
 	// Whatever happens, we no longer need the compilation units...
 	std::for_each(shaders.begin(), shaders.end(), glDeleteShader);
+
+	if (success)
+	{
+		*shader = newShader;
+
+    GLint numParams;
+    glGetProgramiv(newShader->id, GL_ACTIVE_UNIFORMS, &numParams);
+    if (numParams > 0)
+    {
+      newShader->params.resize(numParams);
+			// Get information about the active shader uniform values...
+			std::vector<GLuint> indices(numParams);
+			std::vector<GLint>  nameLengths(numParams);
+			std::vector<GLint>  blockIndices(numParams);
+			std::vector<GLint>  types(numParams);
+			for (int i = 0; i < numParams; ++i) { indices[i] = i; }
+			glGetActiveUniformsiv(newShader->id, numParams, indices.data(), GL_UNIFORM_BLOCK_INDEX, blockIndices.data());
+			glGetActiveUniformsiv(newShader->id, numParams, indices.data(), GL_UNIFORM_NAME_LENGTH, nameLengths.data());
+			glGetActiveUniformsiv(newShader->id, numParams, indices.data(), GL_UNIFORM_TYPE, types.data());
+
+			for (int i = 0; i < numParams; ++i)
+			{
+				// Only handling non block-based variables for now...
+				if (-1 == blockIndices[i])
+				{
+					glGetActiveUniformName(newShader->id, i, sizeof(newShader->params[0].name) - 1, NULL, newShader->params[i].name);
+					newShader->params[i].location = glGetUniformLocation(newShader->id, newShader->params[i].name);
+					newShader->params[i].type = types[i];
+				}
+			}
+		}
+	}
 
 	return success;
 }
@@ -38,6 +79,7 @@ static GLuint CompileShader(GLenum type, const std::string& filename)
 	std::string src;
 	if (LoadSourceFile("shaders\\" + filename, src))
 	{
+		src.insert(0, commonCode);
 		const char* srcCode = src.data();
 		// Create the shader program, load the file and compile it, then report any errors...
 		glShaderSource(shader, 1, &srcCode, NULL);
