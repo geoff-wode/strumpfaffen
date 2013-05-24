@@ -22,9 +22,9 @@ private:
 	bool running;
 	GLuint vao;
 	GLuint positionsBuffer;
-	Shader shader;
+	boost::shared_ptr<Shader> shader;
 	glm::mat4 model;
-	GLuint mvp;
+	size_t mvpParam;
 };
 
 #endif __GAME_H__

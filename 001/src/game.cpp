@@ -45,18 +45,22 @@ bool Game::Init()
 
 bool Game::Load()
 {
-	if (NewShaderProgram("simple.vs.glsl", "red.fs.glsl", &shader))
+	shader = Shader::New();
+	if (shader)
 	{
+		if (!shader->Load("simple.vs.glsl", "red.fs.glsl"))
+		{
+			return false;
+		}
+
+		mvpParam = shader->GetParamIndex("ModelViewProjection");
+
 		glGenVertexArrays(1, &vao);
 		glBindVertexArray(vao);
 		NewVertexBuffer(sizeof(positions), positions, &positionsBuffer);
 	}
-	else
-	{
-		running = false;
-	}
 
-	return running;
+	return true;
 }
 
 void Game::Update(float elapsedMS)
@@ -64,6 +68,7 @@ void Game::Update(float elapsedMS)
 	HandleInput(&running);
 	if (IsRunning())
 	{
+		shader->SetParam(mvpParam, display.viewProjection * model);
 	}
 }
 
@@ -71,9 +76,7 @@ void Game::Render(float elapsedMS)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glUseProgram(shader->id);
-	glm::mat4 temp = display.viewProjection * model;
-	glUniformMatrix4fv(shader->params[0].location, 1, GL_FALSE, &temp[0][0]);
+	shader->Apply();
 
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, positionsBuffer);

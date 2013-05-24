@@ -4,6 +4,18 @@
 #include <vector>
 #include <algorithm>
 #include <debug.h>
+#include <glm/gtc/type_ptr.hpp>
+
+//----------------------------------------------------------
+
+struct ShaderParameter
+{
+	bool dirty;       // whether the cache is out of step with the GPU side, forcing an upload on Shader::Apply if it is
+	GLuint location;  // as given by the "layout (location = n)" attribute declaration
+	GLenum type;      // the type of the data stored in the attribute (gleaned from the shader program itself)
+	uint8_t data[16 * sizeof(double)]; // CPU cache for quick recall
+	GLchar name[32];  // the name of the parameter (gleaned from the shader program itself)
+};
 
 //----------------------------------------------------------
 
@@ -20,53 +32,145 @@ const std::string commonCode(
 
 //----------------------------------------------------------
 
-bool NewShaderProgram(const std::string& vsSrc, const std::string& fsSrc, Shader* shader)
+boost::shared_ptr<Shader> Shader::New()
 {
-	Shader newShader(new ShaderData());
+	boost::shared_ptr<Shader> shader(new Shader());
+	return shader;
+}
 
+//----------------------------------------------------------
+
+Shader::Shader()
+	: id(-1), params(NULL)
+{
+}
+
+//----------------------------------------------------------
+
+Shader::~Shader()
+{
+	glDeleteProgram(id);
+}
+
+//----------------------------------------------------------
+
+void Shader::Apply()
+{
+	glUseProgram(id);
+  for (size_t i = 0; i < params.size(); ++i)
+  {
+    if (params[i].dirty)
+    {
+      switch (params[i].type)
+      {
+      case GL_FLOAT:      glUniform1fv(params[i].location, 1, (float*)params[i].data); break;
+      case GL_FLOAT_VEC2: glUniform2fv(params[i].location, 1, (float*)params[i].data); break;
+      case GL_FLOAT_VEC3: glUniform3fv(params[i].location, 1, (float*)params[i].data); break;
+      case GL_FLOAT_VEC4: glUniform4fv(params[i].location, 1, (float*)params[i].data); break;
+      case GL_FLOAT_MAT3: glUniformMatrix3fv(params[i].location, 1, GL_FALSE, (float*)params[i].data); break;
+      case GL_FLOAT_MAT4: glUniformMatrix4fv(params[i].location, 1, GL_FALSE, (float*)params[i].data); break;
+      default: ASSERTM(false, "unsupported type used in shader"); break;
+      }
+      params[i].dirty = false;
+    }
+  }
+}
+
+//----------------------------------------------------------
+
+bool Shader::Load(const std::string& vsSrc, const std::string& fsSrc)
+{
 	std::vector<GLuint> shaders;
 
 	shaders.push_back(CompileShader(GL_VERTEX_SHADER, vsSrc));
 	shaders.push_back(CompileShader(GL_FRAGMENT_SHADER, fsSrc));
 
-	const bool success = LinkProgram(shaders, &newShader->id);
+	const bool success = LinkProgram(shaders, &id);
 
 	// Whatever happens, we no longer need the compilation units...
 	std::for_each(shaders.begin(), shaders.end(), glDeleteShader);
 
 	if (success)
 	{
-		*shader = newShader;
-
     GLint numParams;
-    glGetProgramiv(newShader->id, GL_ACTIVE_UNIFORMS, &numParams);
+    glGetProgramiv(id, GL_ACTIVE_UNIFORMS, &numParams);
+		params.resize(numParams);
     if (numParams > 0)
     {
-      newShader->params.resize(numParams);
 			// Get information about the active shader uniform values...
 			std::vector<GLuint> indices(numParams);
 			std::vector<GLint>  nameLengths(numParams);
 			std::vector<GLint>  blockIndices(numParams);
 			std::vector<GLint>  types(numParams);
 			for (int i = 0; i < numParams; ++i) { indices[i] = i; }
-			glGetActiveUniformsiv(newShader->id, numParams, indices.data(), GL_UNIFORM_BLOCK_INDEX, blockIndices.data());
-			glGetActiveUniformsiv(newShader->id, numParams, indices.data(), GL_UNIFORM_NAME_LENGTH, nameLengths.data());
-			glGetActiveUniformsiv(newShader->id, numParams, indices.data(), GL_UNIFORM_TYPE, types.data());
+			glGetActiveUniformsiv(id, numParams, indices.data(), GL_UNIFORM_BLOCK_INDEX, blockIndices.data());
+			glGetActiveUniformsiv(id, numParams, indices.data(), GL_UNIFORM_NAME_LENGTH, nameLengths.data());
+			glGetActiveUniformsiv(id, numParams, indices.data(), GL_UNIFORM_TYPE, types.data());
 
 			for (int i = 0; i < numParams; ++i)
 			{
 				// Only handling non block-based variables for now...
 				if (-1 == blockIndices[i])
 				{
-					glGetActiveUniformName(newShader->id, i, sizeof(newShader->params[0].name) - 1, NULL, newShader->params[i].name);
-					newShader->params[i].location = glGetUniformLocation(newShader->id, newShader->params[i].name);
-					newShader->params[i].type = types[i];
+					glGetActiveUniformName(id, i, sizeof(params[0].name) - 1, NULL, params[i].name);
+					params[i].location = glGetUniformLocation(id, params[i].name);
+					params[i].type = types[i];
 				}
 			}
 		}
 	}
 
 	return success;
+}
+
+//----------------------------------------------------------
+
+size_t Shader::GetParamIndex(const char* name) const
+{
+	for (size_t i = 0; (i < params.size()); ++i)
+	{
+		if (0 == strcmp(params[i].name, name))
+		{
+			return i;
+		}
+	}
+	return (size_t)-1;
+}
+
+//----------------------------------------------------------
+
+void Shader::SetParam(size_t index, float value) { CacheParam(index, &value, sizeof(value)); }
+void Shader::SetParam(size_t index, const glm::vec2& value) { CacheParam(index, glm::value_ptr(value), sizeof(value)); }
+void Shader::SetParam(size_t index, const glm::vec3& value) { CacheParam(index, glm::value_ptr(value), sizeof(value)); }
+void Shader::SetParam(size_t index, const glm::vec4& value) { CacheParam(index, glm::value_ptr(value), sizeof(value)); }
+void Shader::SetParam(size_t index, const glm::mat2& value) { CacheParam(index, glm::value_ptr(value), sizeof(value)); }
+void Shader::SetParam(size_t index, const glm::mat3& value) { CacheParam(index, glm::value_ptr(value), sizeof(value)); }
+void Shader::SetParam(size_t index, const glm::mat4& value) { CacheParam(index, glm::value_ptr(value), sizeof(value)); }
+
+void Shader::SetParam(const char* name, float value) { CacheParam(GetParamIndex(name), &value, sizeof(value)); }
+void Shader::SetParam(const char* name, const glm::vec2& value) { CacheParam(GetParamIndex(name), glm::value_ptr(value), sizeof(value)); }
+void Shader::SetParam(const char* name, const glm::vec3& value) { CacheParam(GetParamIndex(name), glm::value_ptr(value), sizeof(value)); }
+void Shader::SetParam(const char* name, const glm::vec4& value) { CacheParam(GetParamIndex(name), glm::value_ptr(value), sizeof(value)); }
+void Shader::SetParam(const char* name, const glm::mat2& value) { CacheParam(GetParamIndex(name), glm::value_ptr(value), sizeof(value)); }
+void Shader::SetParam(const char* name, const glm::mat3& value) { CacheParam(GetParamIndex(name), glm::value_ptr(value), sizeof(value)); }
+void Shader::SetParam(const char* name, const glm::mat4& value) { CacheParam(GetParamIndex(name), glm::value_ptr(value), sizeof(value)); }
+
+//----------------------------------------------------------
+
+void Shader::CacheParam(size_t index, const void* data, size_t size)
+{
+	if (index < params.size())
+	{
+		if (0 != memcmp(params[index].data, data, size))
+		{
+			memcpy(params[index].data, data, size);
+			params[index].dirty = true;
+		}
+	}
+	else
+	{
+		ASSERTM(false, "parameter (%d) out of range", index);
+	}
 }
 
 //----------------------------------------------------------

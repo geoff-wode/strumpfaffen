@@ -21,25 +21,25 @@ int main(int argc, char* argv[])
 
 	InitSystem(display.width, display.height);
 
-	game.Init();
-	game.Load();
-
-  const float frameRate = 1000.0f / 60.0f;
-  float previousTime = 0.0f;
-  while (game.IsRunning())
-  {
-		float now = (float)SDL_GetTicks();
-    float deltaMS = (now - previousTime) / 1000.0f;
-    if (deltaMS > frameRate) { deltaMS = frameRate; }
-    previousTime = now;
-
-		game.Update(deltaMS);
-		display.Update();
-
-		if (game.IsRunning())
+	if (game.Init() && game.Load())
+	{
+		const float frameRate = 1000.0f / 60.0f;
+		float previousTime = 0.0f;
+		while (game.IsRunning())
 		{
-			game.Render(deltaMS);
-			SDL_GL_SwapBuffers();	
+			float now = (float)SDL_GetTicks();
+			float deltaMS = (now - previousTime) / 1000.0f;
+			if (deltaMS > frameRate) { deltaMS = frameRate; }
+			previousTime = now;
+
+			game.Update(deltaMS);
+			display.Update();
+
+			if (game.IsRunning())
+			{
+				game.Render(deltaMS);
+				SDL_GL_SwapBuffers();	
+			}
 		}
 	}
 
