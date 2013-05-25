@@ -126,6 +126,7 @@ echo Build post-step for $(ProjectName) complete.</Command>
     <ClCompile Include="src\gl\gl_core_4.2.c" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\shaders.cpp" />
+    <ClCompile Include="src\texture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="h\buffers.h" />
@@ -135,10 +136,11 @@ echo Build post-step for $(ProjectName) complete.</Command>
     <ClInclude Include="h\gl\gl_core_4.2.h" />
     <ClInclude Include="h\gl\gl_loader.h" />
     <ClInclude Include="h\shaders.h" />
+    <ClInclude Include="h\texture.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\passthru.vs.glsl" />
-    <None Include="shaders\red.fs.glsl" />
+    <None Include="shaders\simple.fs.glsl" />
     <None Include="shaders\simple.vs.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

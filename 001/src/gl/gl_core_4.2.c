@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include <stddef.h>
 #include <gl/gl_loader.h>
 
 #if defined(__APPLE__)
@@ -93,6 +94,10 @@ static PROC WinGetProcAddress(const char *name)
 		#endif
 	#endif
 #endif
+
+int ogl_ext_EXT_texture_compression_s3tc = ogl_LOAD_FAILED;
+int ogl_ext_EXT_texture_sRGB = ogl_LOAD_FAILED;
+int ogl_ext_EXT_texture_filter_anisotropic = ogl_LOAD_FAILED;
 
 void (CODEGEN_FUNCPTR *_ptrc_glCullFace)(GLenum ) = NULL;
 void (CODEGEN_FUNCPTR *_ptrc_glFrontFace)(GLenum ) = NULL;
@@ -1636,11 +1641,13 @@ typedef struct ogl_StrToExtMap_s
 	PFN_LOADFUNCPOINTERS LoadExtension;
 } ogl_StrToExtMap;
 
-static ogl_StrToExtMap ExtensionMap[1] = {
-	{"", NULL, NULL},
+static ogl_StrToExtMap ExtensionMap[3] = {
+	{"GL_EXT_texture_compression_s3tc", &ogl_ext_EXT_texture_compression_s3tc, NULL},
+	{"GL_EXT_texture_sRGB", &ogl_ext_EXT_texture_sRGB, NULL},
+	{"GL_EXT_texture_filter_anisotropic", &ogl_ext_EXT_texture_filter_anisotropic, NULL},
 };
 
-static int g_extensionMapSize = 0;
+static int g_extensionMapSize = 3;
 
 static ogl_StrToExtMap *FindExtEntry(const char *extensionName)
 {
@@ -1657,6 +1664,9 @@ static ogl_StrToExtMap *FindExtEntry(const char *extensionName)
 
 static void ClearExtensionVars()
 {
+	ogl_ext_EXT_texture_compression_s3tc = ogl_LOAD_FAILED;
+	ogl_ext_EXT_texture_sRGB = ogl_LOAD_FAILED;
+	ogl_ext_EXT_texture_filter_anisotropic = ogl_LOAD_FAILED;
 }
 
 
@@ -1704,9 +1714,9 @@ int ogl_LoadFunctions()
 	int numFailed = 0;
 	ClearExtensionVars();
 	
-	_ptrc_glGetIntegerv = (void (__stdcall *)(GLenum,GLint*))IntGetProcAddress("glGetIntegerv");
+	_ptrc_glGetIntegerv = (void (CODEGEN_FUNCPTR *)(GLenum , GLint *))IntGetProcAddress("glGetIntegerv");
 	if(!_ptrc_glGetIntegerv) return ogl_LOAD_FAILED;
-	_ptrc_glGetStringi = (const GLubyte* (__stdcall *)(GLenum,GLuint))IntGetProcAddress("glGetStringi");
+	_ptrc_glGetStringi = (const GLubyte * (CODEGEN_FUNCPTR *)(GLenum , GLuint ))IntGetProcAddress("glGetStringi");
 	if(!_ptrc_glGetStringi) return ogl_LOAD_FAILED;
 	
 	ProcExtsFromExtList();

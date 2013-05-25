@@ -174,10 +174,43 @@
 #ifndef GL_NV_vdpau_interop
 	typedef GLintptr GLvdpauSurfaceNV;
 #endif
+#ifndef GL_OES_fixed_point
+	/* GLint must be 32 bits, a relatively safe assumption on modern CPUs */
+	typedef GLint GLfixed;
+#endif
 
 #ifdef __cplusplus
 extern "C" {
 #endif /*__cplusplus*/
+
+extern int ogl_ext_EXT_texture_compression_s3tc;
+extern int ogl_ext_EXT_texture_sRGB;
+extern int ogl_ext_EXT_texture_filter_anisotropic;
+
+#define GL_COMPRESSED_RGB_S3TC_DXT1_EXT 0x83F0
+#define GL_COMPRESSED_RGBA_S3TC_DXT1_EXT 0x83F1
+#define GL_COMPRESSED_RGBA_S3TC_DXT3_EXT 0x83F2
+#define GL_COMPRESSED_RGBA_S3TC_DXT5_EXT 0x83F3
+
+#define GL_SRGB_EXT 0x8C40
+#define GL_SRGB8_EXT 0x8C41
+#define GL_SRGB_ALPHA_EXT 0x8C42
+#define GL_SRGB8_ALPHA8_EXT 0x8C43
+#define GL_SLUMINANCE_ALPHA_EXT 0x8C44
+#define GL_SLUMINANCE8_ALPHA8_EXT 0x8C45
+#define GL_SLUMINANCE_EXT 0x8C46
+#define GL_SLUMINANCE8_EXT 0x8C47
+#define GL_COMPRESSED_SRGB_EXT 0x8C48
+#define GL_COMPRESSED_SRGB_ALPHA_EXT 0x8C49
+#define GL_COMPRESSED_SLUMINANCE_EXT 0x8C4A
+#define GL_COMPRESSED_SLUMINANCE_ALPHA_EXT 0x8C4B
+#define GL_COMPRESSED_SRGB_S3TC_DXT1_EXT 0x8C4C
+#define GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT 0x8C4D
+#define GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT3_EXT 0x8C4E
+#define GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT 0x8C4F
+
+#define GL_TEXTURE_MAX_ANISOTROPY_EXT 0x84FE
+#define GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT 0x84FF
 
 #define GL_DEPTH_BUFFER_BIT 0x00000100
 #define GL_STENCIL_BUFFER_BIT 0x00000400
@@ -827,7 +860,7 @@ extern "C" {
 #define GL_CONTEXT_FLAGS 0x821E
 #define GL_COMPRESSED_RED 0x8225
 #define GL_COMPRESSED_RG 0x8226
-#define GL_CONTEXT_FLAG_FORWARD_COMPATIBLE_BIT 0x0001
+#define GL_CONTEXT_FLAG_FORWARD_COMPATIBLE_BIT 0x00000001
 #define GL_RGBA32F 0x8814
 #define GL_RGB32F 0x8815
 #define GL_RGBA16F 0x881A
@@ -1345,6 +1378,9 @@ extern "C" {
 #define GL_MAX_COMBINED_IMAGE_UNIFORMS 0x90CF
 
 #define GL_TEXTURE_IMMUTABLE_FORMAT 0x912F
+
+
+
 
 extern void (CODEGEN_FUNCPTR *_ptrc_glCullFace)(GLenum );
 #define glCullFace _ptrc_glCullFace
