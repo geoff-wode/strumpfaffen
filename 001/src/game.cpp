@@ -1,8 +1,6 @@
 #include <SDL.h>
 #include <game.h>
 #include <gl/gl_loader.h>
-#include <buffers.h>
-#include <shaders.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/transform.hpp>
@@ -59,15 +57,12 @@ const unsigned int triangleCount = sizeof(positions) / sizeof(positions[0]);
 //----------------------------------------------------------
 
 Game::Game()
-	: running(true),
-		model(1.0f)
+	: running(true)
 {
 }
 
 Game::~Game()
 {
-	glDeleteBuffers(1, &positionsBuffer);
-	glDeleteVertexArrays(1, &vao);
 }
 
 bool Game::Init()
@@ -87,12 +82,13 @@ bool Game::Load()
 			return false;
 		}
 
-		//shader->SetParam("outColour", glm::vec3(1));
 		mvpParam = shader->GetParamIndex("ModelViewProjection");
 
-		glGenVertexArrays(1, &vao);
-		glBindVertexArray(vao);
-		NewVertexBuffer(sizeof(positions), positions, &positionsBuffer);
+		model = Model::New();
+		if (!model->Load("untitled.obj"))
+		{
+			return false;
+		}
 	}
 
 	return true;
@@ -104,9 +100,9 @@ void Game::Update(float elapsedMS)
 	if (IsRunning())
 	{
 		static float angle = 0.0f;
-		model = glm::rotate(angle, glm::vec3(0,1,0));
+		modelMatrix = glm::rotate(angle, glm::vec3(0,1,0));
 		angle += (100 * elapsedMS);
-		shader->SetParam(mvpParam, display.viewProjection * model);
+		shader->SetParam(mvpParam, display.viewProjection * modelMatrix);
 	}
 }
 
@@ -115,15 +111,7 @@ void Game::Render(float elapsedMS)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	shader->Apply();
-
-	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, positionsBuffer);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-	glDrawArrays(GL_TRIANGLES, 0, triangleCount * 3);
-
-	glDisableVertexAttribArray(0);
-	glUseProgram(0);
+	model->Render();
 }
 
 static void HandleInput(bool* keepRunning)

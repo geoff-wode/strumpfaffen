@@ -71,10 +71,14 @@ if errorlevel 1 goto OnFault
 xcopy $(ProjectDir)shaders $(OutDir)shaders /s/i/r/y
 if errorlevel 1 goto OnFault
 
+xcopy $(ProjectDir)models $(OutDir)models /s/i/r/y
+if errorlevel 1 goto OnFault
+
 goto OnOkay
 
 :OnFault
 echo Build post-step for $(ProjectName) failed.
+exit
 
 :OnOkay
 echo Build post-step for $(ProjectName) complete.</Command>
@@ -125,6 +129,7 @@ echo Build post-step for $(ProjectName) complete.</Command>
     <ClCompile Include="src\game.cpp" />
     <ClCompile Include="src\gl\gl_core_4.2.c" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\model.cpp" />
     <ClCompile Include="src\shaders.cpp" />
     <ClCompile Include="src\texture.cpp" />
   </ItemGroup>
@@ -135,6 +140,7 @@ echo Build post-step for $(ProjectName) complete.</Command>
     <ClInclude Include="h\game.h" />
     <ClInclude Include="h\gl\gl_core_4.2.h" />
     <ClInclude Include="h\gl\gl_loader.h" />
+    <ClInclude Include="h\model.h" />
     <ClInclude Include="h\shaders.h" />
     <ClInclude Include="h\texture.h" />
   </ItemGroup>
@@ -142,6 +148,11 @@ echo Build post-step for $(ProjectName) complete.</Command>
     <None Include="shaders\passthru.vs.glsl" />
     <None Include="shaders\simple.fs.glsl" />
     <None Include="shaders\simple.vs.glsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="models\untitled.obj">
+      <FileType>Document</FileType>
+    </None>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

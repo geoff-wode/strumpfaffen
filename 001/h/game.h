@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 #include <gl/gl_loader.h>
 #include <shaders.h>
+#include <model.h>
 
 class Game
 {
@@ -20,10 +21,9 @@ public:
 
 private:
 	bool running;
-	GLuint vao;
-	GLuint positionsBuffer;
 	boost::shared_ptr<Shader> shader;
-	glm::mat4 model;
+	boost::shared_ptr<Model> model;
+	glm::mat4 modelMatrix;
 	size_t mvpParam;
 };
 

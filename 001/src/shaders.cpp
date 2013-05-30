@@ -180,15 +180,16 @@ static GLuint CompileShader(GLenum type, const std::string& filename)
 	GLuint shader = glCreateShader(type);
 
 	// Load the shader source code from file...
+	const std::string fullPath("shaders\\" + filename);
 	std::string src;
-	if (LoadSourceFile("shaders\\" + filename, src))
+	if (LoadSourceFile(fullPath, src))
 	{
 		src.insert(0, commonCode);
 		const char* srcCode = src.data();
 		// Create the shader program, load the file and compile it, then report any errors...
 		glShaderSource(shader, 1, &srcCode, NULL);
 
-		LOG("compilation of %s", filename.c_str());
+		LOG("compilation of %s", fullPath.c_str());
 		glCompileShader(shader);
 
 		GLint status;

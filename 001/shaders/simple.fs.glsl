@@ -4,5 +4,5 @@ out vec4 colour;
 
 void main()
 {
-  colour = vec4(texture(textureSampler, uv).rgb,1);
+  colour = vec4(fragmentUV,0,1);
 }
