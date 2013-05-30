@@ -120,7 +120,7 @@ static bool LoadOBJFile(const std::string& filename, std::vector<Vertex>& vertic
 		{
 			float u, v;
 			fscanf(in, "%f %f\n", &u, &v);
-			uvList.push_back(glm::vec2(u, v));
+			uvList.push_back(glm::vec2(u, 1.0f - v)); // need to invert v to use DDS-DXT textures in GL
 		}
 		else if (0 == strcmp("vn", lineHeader))
 		{

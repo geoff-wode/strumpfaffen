@@ -5,6 +5,7 @@
 #include <gl/gl_loader.h>
 #include <shaders.h>
 #include <model.h>
+#include <texture.h>
 
 class Game
 {
@@ -23,8 +24,10 @@ private:
 	bool running;
 	boost::shared_ptr<Shader> shader;
 	boost::shared_ptr<Model> model;
+	boost::shared_ptr<Texture> texture;
 	glm::mat4 modelMatrix;
 	size_t mvpParam;
+	size_t textureSampler;
 };
 
 #endif __GAME_H__

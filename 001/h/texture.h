@@ -8,7 +8,7 @@
 class Texture
 {
 public:
-	static boost::shared_ptr<Texture> New(GLint minFilter, GLint magFilter);
+	static boost::shared_ptr<Texture> New();
 	
 	virtual ~Texture();
 
@@ -16,12 +16,15 @@ public:
 
 	void Apply() const;
 
+	GLint	magFilter;
+	GLint minFilter;
+	GLint wrapS;
+	GLint wrapT;
+
 private:
 	Texture();
 
 	GLuint id;
-	GLint	magFilter;
-	GLint minFilter;
 };
 
 #endif // __TEXTURE_H__

@@ -74,6 +74,9 @@ if errorlevel 1 goto OnFault
 xcopy $(ProjectDir)models $(OutDir)models /s/i/r/y
 if errorlevel 1 goto OnFault
 
+xcopy $(ProjectDir)images $(OutDir)images /s/i/r/y
+if errorlevel 1 goto OnFault
+
 goto OnOkay
 
 :OnFault

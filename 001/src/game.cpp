@@ -75,21 +75,15 @@ bool Game::Init()
 bool Game::Load()
 {
 	shader = Shader::New();
-	if (shader)
-	{
-		if (!shader->Load("simple.vs.glsl", "simple.fs.glsl"))
-		{
-			return false;
-		}
+	shader->Load("simple.vs.glsl", "simple.fs.glsl");
+	mvpParam = shader->GetParamIndex("ModelViewProjection");
+	textureSampler = shader->GetParamIndex("textureSampler");
 
-		mvpParam = shader->GetParamIndex("ModelViewProjection");
+	model = Model::New();
+	model->Load("untitled.obj");
 
-		model = Model::New();
-		if (!model->Load("untitled.obj"))
-		{
-			return false;
-		}
-	}
+	texture = Texture::New();
+	texture->Load("untitled.DDS");
 
 	return true;
 }
@@ -111,6 +105,11 @@ void Game::Render(float elapsedMS)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	shader->Apply();
+
+	glActiveTexture(GL_TEXTURE0);
+	texture->Apply();
+	glUniform1i(textureSampler, 0);
+
 	model->Render();
 }
 
