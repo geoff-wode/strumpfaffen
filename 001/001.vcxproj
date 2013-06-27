@@ -133,6 +133,7 @@ echo Build post-step for $(ProjectName) complete.</Command>
     <ClCompile Include="src\gl\gl_core_4.2.c" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\model.cpp" />
+    <ClCompile Include="src\sampler.cpp" />
     <ClCompile Include="src\shaders.cpp" />
     <ClCompile Include="src\texture.cpp" />
   </ItemGroup>
@@ -144,6 +145,8 @@ echo Build post-step for $(ProjectName) complete.</Command>
     <ClInclude Include="h\gl\gl_core_4.2.h" />
     <ClInclude Include="h\gl\gl_loader.h" />
     <ClInclude Include="h\model.h" />
+    <ClInclude Include="h\property.h" />
+    <ClInclude Include="h\sampler.h" />
     <ClInclude Include="h\shaders.h" />
     <ClInclude Include="h\texture.h" />
   </ItemGroup>
@@ -154,6 +157,11 @@ echo Build post-step for $(ProjectName) complete.</Command>
   </ItemGroup>
   <ItemGroup>
     <None Include="models\untitled.obj">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="models\monkey.obj">
       <FileType>Document</FileType>
     </None>
   </ItemGroup>

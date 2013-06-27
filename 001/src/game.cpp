@@ -76,14 +76,14 @@ bool Game::Load()
 {
 	shader = Shader::New();
 	shader->Load("simple.vs.glsl", "simple.fs.glsl");
-	mvpParam = shader->GetParamIndex("ModelViewProjection");
-	textureSampler = shader->GetParamIndex("textureSampler");
+	mvpParam = shader->GetParameter("ModelViewProjection");
+	textureSampler = shader->GetParameter("textureSampler");
 
 	model = Model::New();
-	model->Load("untitled.obj");
+	model->Load("monkey.obj");
 
-	texture = Texture::New();
-	texture->Load("untitled.DDS");
+	texture = Texture::New(0);
+	texture->Load("monkey.DDS");
 
 	return true;
 }
@@ -105,11 +105,7 @@ void Game::Render(float elapsedMS)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	shader->Apply();
-
-	glActiveTexture(GL_TEXTURE0);
-	texture->Apply();
-	glUniform1i(textureSampler, 0);
-
+//	texture->Apply();
 	model->Render();
 }
 

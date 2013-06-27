@@ -26,8 +26,8 @@ private:
 	boost::shared_ptr<Model> model;
 	boost::shared_ptr<Texture> texture;
 	glm::mat4 modelMatrix;
-	size_t mvpParam;
-	size_t textureSampler;
+	Shader::Parameter mvpParam;
+	Shader::Parameter textureSampler;
 };
 
 #endif __GAME_H__

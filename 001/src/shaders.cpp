@@ -22,6 +22,7 @@ struct ShaderParameter
 static GLuint CompileShader(GLenum type, const std::string& filename);
 static bool LinkProgram(const std::vector<GLuint>& shaders, GLuint* program);
 static bool LoadSourceFile(const std::string& filename, std::string& content);
+static void CacheParam(Shader::Parameter param, const void* data, size_t size);
 
 //----------------------------------------------------------
 
@@ -125,51 +126,51 @@ bool Shader::Load(const std::string& vsSrc, const std::string& fsSrc)
 
 //----------------------------------------------------------
 
-size_t Shader::GetParamIndex(const char* name) const
+Shader::Parameter Shader::GetParameter(const char* name) const
 {
 	for (size_t i = 0; (i < params.size()); ++i)
 	{
 		if (0 == strcmp(params[i].name, name))
 		{
-			return i;
+			return (Shader::Parameter)&params[i];
 		}
 	}
-	return (size_t)-1;
+	return NULL;
 }
 
 //----------------------------------------------------------
 
-void Shader::SetParam(size_t index, float value) { CacheParam(index, &value, sizeof(value)); }
-void Shader::SetParam(size_t index, const glm::vec2& value) { CacheParam(index, glm::value_ptr(value), sizeof(value)); }
-void Shader::SetParam(size_t index, const glm::vec3& value) { CacheParam(index, glm::value_ptr(value), sizeof(value)); }
-void Shader::SetParam(size_t index, const glm::vec4& value) { CacheParam(index, glm::value_ptr(value), sizeof(value)); }
-void Shader::SetParam(size_t index, const glm::mat2& value) { CacheParam(index, glm::value_ptr(value), sizeof(value)); }
-void Shader::SetParam(size_t index, const glm::mat3& value) { CacheParam(index, glm::value_ptr(value), sizeof(value)); }
-void Shader::SetParam(size_t index, const glm::mat4& value) { CacheParam(index, glm::value_ptr(value), sizeof(value)); }
+void Shader::SetParam(Parameter param, float value) { CacheParam(param, &value, sizeof(value)); }
+void Shader::SetParam(Parameter param, const glm::vec2& value) { CacheParam(param, glm::value_ptr(value), sizeof(value)); }
+void Shader::SetParam(Parameter param, const glm::vec3& value) { CacheParam(param, glm::value_ptr(value), sizeof(value)); }
+void Shader::SetParam(Parameter param, const glm::vec4& value) { CacheParam(param, glm::value_ptr(value), sizeof(value)); }
+void Shader::SetParam(Parameter param, const glm::mat2& value) { CacheParam(param, glm::value_ptr(value), sizeof(value)); }
+void Shader::SetParam(Parameter param, const glm::mat3& value) { CacheParam(param, glm::value_ptr(value), sizeof(value)); }
+void Shader::SetParam(Parameter param, const glm::mat4& value) { CacheParam(param, glm::value_ptr(value), sizeof(value)); }
 
-void Shader::SetParam(const char* name, float value) { CacheParam(GetParamIndex(name), &value, sizeof(value)); }
-void Shader::SetParam(const char* name, const glm::vec2& value) { CacheParam(GetParamIndex(name), glm::value_ptr(value), sizeof(value)); }
-void Shader::SetParam(const char* name, const glm::vec3& value) { CacheParam(GetParamIndex(name), glm::value_ptr(value), sizeof(value)); }
-void Shader::SetParam(const char* name, const glm::vec4& value) { CacheParam(GetParamIndex(name), glm::value_ptr(value), sizeof(value)); }
-void Shader::SetParam(const char* name, const glm::mat2& value) { CacheParam(GetParamIndex(name), glm::value_ptr(value), sizeof(value)); }
-void Shader::SetParam(const char* name, const glm::mat3& value) { CacheParam(GetParamIndex(name), glm::value_ptr(value), sizeof(value)); }
-void Shader::SetParam(const char* name, const glm::mat4& value) { CacheParam(GetParamIndex(name), glm::value_ptr(value), sizeof(value)); }
+void Shader::SetParam(const char* name, float value) { CacheParam(GetParameter(name), &value, sizeof(value)); }
+void Shader::SetParam(const char* name, const glm::vec2& value) { CacheParam(GetParameter(name), glm::value_ptr(value), sizeof(value)); }
+void Shader::SetParam(const char* name, const glm::vec3& value) { CacheParam(GetParameter(name), glm::value_ptr(value), sizeof(value)); }
+void Shader::SetParam(const char* name, const glm::vec4& value) { CacheParam(GetParameter(name), glm::value_ptr(value), sizeof(value)); }
+void Shader::SetParam(const char* name, const glm::mat2& value) { CacheParam(GetParameter(name), glm::value_ptr(value), sizeof(value)); }
+void Shader::SetParam(const char* name, const glm::mat3& value) { CacheParam(GetParameter(name), glm::value_ptr(value), sizeof(value)); }
+void Shader::SetParam(const char* name, const glm::mat4& value) { CacheParam(GetParameter(name), glm::value_ptr(value), sizeof(value)); }
 
 //----------------------------------------------------------
 
-void Shader::CacheParam(size_t index, const void* data, size_t size)
+static void CacheParam(Shader::Parameter param, const void* data, size_t size)
 {
-	if (index < params.size())
+	if (NULL != param)
 	{
-		if (0 != memcmp(params[index].data, data, size))
+		if (0 != memcmp(param->data, data, size))
 		{
-			memcpy(params[index].data, data, size);
-			params[index].dirty = true;
+			memcpy(param->data, data, size);
+			param->dirty = true;
 		}
 	}
 	else
 	{
-		ASSERTM(false, "parameter (%d) out of range", index);
+		ASSERTM(false, "invalid shader parameter");
 	}
 }
 

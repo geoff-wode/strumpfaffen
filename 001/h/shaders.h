@@ -14,6 +14,8 @@ class Shader
 public:
 	static boost::shared_ptr<Shader> New();
 
+	typedef struct ShaderParameter* Parameter;
+
 	Shader();
 	virtual ~Shader();
 
@@ -21,15 +23,15 @@ public:
 	
 	void Apply();
 
-	void SetParam(size_t index, float value);
-	void SetParam(size_t index, const glm::vec2& value);
-	void SetParam(size_t index, const glm::vec3& value);
-	void SetParam(size_t index, const glm::vec4& value);
-	void SetParam(size_t index, const glm::mat2& value);
-	void SetParam(size_t index, const glm::mat3& value);
-	void SetParam(size_t index, const glm::mat4& value);
+	Parameter GetParameter(const char* name) const;
 
-	size_t GetParamIndex(const char* name) const;
+	void SetParam(Parameter param, float value);
+	void SetParam(Parameter param, const glm::vec2& value);
+	void SetParam(Parameter param, const glm::vec3& value);
+	void SetParam(Parameter param, const glm::vec4& value);
+	void SetParam(Parameter param, const glm::mat2& value);
+	void SetParam(Parameter param, const glm::mat3& value);
+	void SetParam(Parameter param, const glm::mat4& value);
 
 	void SetParam(const char* name, float value);
 	void SetParam(const char* name, const glm::vec2& value);
@@ -42,7 +44,6 @@ public:
 private:
 	GLuint id;
 	std::vector<struct ShaderParameter> params;
-	void CacheParam(size_t index, const void* data, size_t size);
 };
 
 #endif // __SHADERS_H__
