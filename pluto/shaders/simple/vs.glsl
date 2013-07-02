@@ -1,10 +1,11 @@
-layout(location = 0) in vec3 position;
-layout(location = 1) in vec2 texCoord;
 
+out vec3 fragmentNormal;
 out vec2 fragmentUV;
 
 void main()
 {
-  gl_Position = ModelViewProjection * vec4(position, 1);
-  fragmentUV = texCoord;
+  gl_Position = ModelViewProjection * vec4(Position, 1);
+
+  fragmentNormal = Normal;
+  fragmentUV = TexCoord0;
 }

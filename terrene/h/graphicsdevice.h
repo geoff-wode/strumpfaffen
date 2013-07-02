@@ -4,7 +4,7 @@
 #include <boost/noncopyable.hpp>
 #include <terrene/h/viewport.h>
 #include <terrene/h/clearstate.h>
-#include <terrene/h/vertexbuffer.h>
+#include <terrene/h/buffers/vertexbuffer.h>
 
 namespace Terrene
 {

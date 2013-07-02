@@ -11,12 +11,19 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="h\bufferusagehint.h" />
+    <ClInclude Include="h\buffers\buffer.h" />
+    <ClInclude Include="h\buffers\bufferusagehint.h" />
     <ClInclude Include="h\clearstate.h" />
     <ClInclude Include="h\colour.h" />
+    <ClInclude Include="h\buffers\indexbuffer.h" />
     <ClInclude Include="h\inputmanager.h" />
-    <ClInclude Include="h\shader.h" />
-    <ClInclude Include="h\vertexbuffer.h" />
+    <ClInclude Include="h\model.h" />
+    <ClInclude Include="h\shader\shader.h" />
+    <ClInclude Include="h\shader\shaderattribute.h" />
+    <ClInclude Include="h\shader\shaderparameter.h" />
+    <ClInclude Include="h\buffers\vertexbuffer.h" />
+    <ClInclude Include="h\vertexarray.h" />
+    <ClInclude Include="h\vertextypes.h" />
     <ClInclude Include="h\viewport.h" />
     <ClInclude Include="h\debug.h" />
     <ClInclude Include="h\graphicsdevice.h" />
@@ -25,9 +32,13 @@
   <ItemGroup>
     <ClCompile Include="c\colour.cpp" />
     <ClCompile Include="c\graphicsdevice.cpp" />
+    <ClCompile Include="c\indexbuffer.cpp" />
     <ClCompile Include="c\inputmanager.cpp" />
+    <ClCompile Include="c\model.cpp" />
     <ClCompile Include="c\program.cpp" />
+    <ClCompile Include="c\vertexarray.cpp" />
     <ClCompile Include="c\vertexbuffer.cpp" />
+    <ClCompile Include="c\vertextypes.cpp" />
     <ClCompile Include="c\viewport.cpp" />
     <ClCompile Include="c\shader.cpp" />
   </ItemGroup>
@@ -40,7 +51,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
@@ -80,8 +91,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>
-      </AdditionalDependencies>
+      <AdditionalDependencies>shlwapi.lib</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

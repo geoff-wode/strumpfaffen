@@ -1,4 +1,4 @@
-#include <shader.h>
+#include <shader/shader.h>
 #include <dirent.h>
 #include <list>
 #include <gl_loader/gl_loader.h>
@@ -213,6 +213,7 @@ static void GetUniformParameters(GLuint shader, ShaderParameterList& parameters)
 		glGetActiveUniformsiv(shader, numParams, indices.data(), GL_UNIFORM_NAME_LENGTH, nameLengths.data());
 		glGetActiveUniformsiv(shader, numParams, indices.data(), GL_UNIFORM_TYPE, types.data());
 
+		unsigned int index = 0;
 		for (int i = 0; i < numParams; ++i)
 		{
 			// Only handling non block-based variables for now...
@@ -224,7 +225,8 @@ static void GetUniformParameters(GLuint shader, ShaderParameterList& parameters)
 				const GLenum type = types[i];
 				
 				ShaderParameter p(new ShaderParameterImpl(name, type, location));
-				parameters.push_back(p);
+				parameters[index] = p;
+				++index;
 			}
 		}
 	}

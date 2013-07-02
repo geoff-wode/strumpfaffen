@@ -1,30 +1,29 @@
+#include <buffers/indexbuffer.h>
 #include <gl_loader/gl_loader.h>
-#include <buffers/vertexbuffer.h>
 #include <debug.h>
 
 using namespace Terrene;
 
-void IVertexBuffer::Deactivate()
+void IIndexBuffer::Deactivate()
 {
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-class VertexBufferImpl : public IVertexBuffer
+class IndexBufferImpl : public IIndexBuffer
 {
 public:
-	VertexBufferImpl() { glGenBuffers(1, &handle); }
-	virtual ~VertexBufferImpl() { glDeleteBuffers(1, &handle); }
+	IndexBufferImpl() { glGenBuffers(1, &handle); }
 
-	// Copy 'sizeInBytes' system data into the buffer from 'data' (assumed to be large enough!).
+	virtual ~IndexBufferImpl() { glDeleteBuffers(1, &handle); }
+
 	virtual void SetData(const void* const data, size_t sizeInBytes)
 	{
-		SetData(data, sizeInBytes, 0);
+		SetData(data, 0, sizeInBytes);
 	}
 
-	// Copy 'sizeInBytes' system data into the buffer at 'offset' from 'data' (assumed to be large enough!).
-	virtual void SetData(const void* const data, size_t sizeInBytes, size_t offset)
+	virtual void SetData(const void* const data, size_t offset, size_t sizeInBytes)
 	{
-		glBufferSubData(GL_ARRAY_BUFFER, offset, sizeInBytes, data);
+		glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, offset, sizeInBytes, data);
 	}
 
 	// Copy 'sizeInBytes' from the buffer into 'data' (assumed to be large enough!).
@@ -41,7 +40,7 @@ public:
 
 	virtual void Activate() const
 	{
-		glBindBuffer(GL_ARRAY_BUFFER, handle);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, handle);
 	}
 
 private:
@@ -50,13 +49,13 @@ private:
 
 //-----------------------------------------------------------------------------
 
-VertexBuffer Terrene::CreateVertexBuffer(BufferUsageHint::Enum hint, size_t sizeInBytes)
+IndexBuffer CreateIndexBuffer(BufferUsageHint::Enum hint, size_t sizeInBytes)
 {
-	VertexBuffer vb(new VertexBufferImpl());
+	IndexBuffer ib(new IndexBufferImpl());
 
-	if (vb)
+	if (ib)
 	{
-		vb->Activate();
+		ib->Activate();
 		GLenum bufferHint;
 		switch (hint)
 		{
@@ -65,9 +64,9 @@ VertexBuffer Terrene::CreateVertexBuffer(BufferUsageHint::Enum hint, size_t size
 		case BufferUsageHint::Stream:  bufferHint = GL_STREAM_DRAW;  break;
 		default: ASSERTM(false, "invalid usage hint\n"); break;
 		}
-		glBufferData(GL_ARRAY_BUFFER, sizeInBytes, NULL, bufferHint);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeInBytes, NULL, bufferHint);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 
-	return vb;
+	return ib;
 }

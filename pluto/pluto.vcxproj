@@ -125,6 +125,12 @@ echo Build post-step for $(ProjectName) complete.
     <None Include="shaders\simple\fs.glsl" />
     <None Include="shaders\simple\vs.glsl" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="models\untitled.obj">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

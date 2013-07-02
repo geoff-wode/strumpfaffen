@@ -1,13 +1,11 @@
-#if ! defined(__VERTEX_BUFFER_H__)
-#define __VERTEX_BUFFER_H__
+#if ! defined(__BUFFER_H__)
+#define __BUFFER_H__
 
-#include <boost/shared_ptr.hpp>
-#include <terrene/h/bufferusagehint.h>
+#include <stddef.h>
 
 namespace Terrene
 {
-
-	class IVertexBuffer
+	class IBuffer
 	{
 	public:
 		// Copy 'sizeInBytes' system data into the buffer from 'data' (assumed to be large enough!).
@@ -22,17 +20,12 @@ namespace Terrene
 		// Copy 'sizeInBytes' from the buffer starting at 'offset' into 'data' (assumed to be large enough!).
 		virtual void GetData(size_t sizeInBytes, size_t offset, void* const data) = 0;
 
-		// Make this vertex buffer active.
+		// Make this buffer type active.
 		virtual void Activate() const = 0;
 
 	protected:
-		~IVertexBuffer() { }
+		~IBuffer() { }
 	};
-
-	typedef boost::shared_ptr<IVertexBuffer> VertexBuffer;
-
-	VertexBuffer CreateVertexBuffer(BufferUsageHint::Enum hint, size_t sizeInBytes);
-
 }
 
-#endif // __VERTEX_BUFFER_H__
+#endif // __BUFFER_H__
