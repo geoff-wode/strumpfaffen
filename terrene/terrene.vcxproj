@@ -18,10 +18,10 @@
     <ClInclude Include="h\buffers\indexbuffer.h" />
     <ClInclude Include="h\inputmanager.h" />
     <ClInclude Include="h\model.h" />
-    <ClInclude Include="h\shader\shader.h" />
-    <ClInclude Include="h\shader\shaderattribute.h" />
-    <ClInclude Include="h\shader\shaderparameter.h" />
+    <ClInclude Include="h\shaderX\parameter.h" />
+    <ClInclude Include="h\shaderX\vertexattribute.h" />
     <ClInclude Include="h\buffers\vertexbuffer.h" />
+    <ClInclude Include="h\shaderX\shader.h" />
     <ClInclude Include="h\vertexarray.h" />
     <ClInclude Include="h\vertextypes.h" />
     <ClInclude Include="h\viewport.h" />
@@ -36,11 +36,15 @@
     <ClCompile Include="c\inputmanager.cpp" />
     <ClCompile Include="c\model.cpp" />
     <ClCompile Include="c\program.cpp" />
+    <ClCompile Include="c\shaders\parameter.cpp" />
+    <ClCompile Include="c\shaders\shaderX.cpp" />
     <ClCompile Include="c\vertexarray.cpp" />
     <ClCompile Include="c\vertexbuffer.cpp" />
     <ClCompile Include="c\vertextypes.cpp" />
     <ClCompile Include="c\viewport.cpp" />
-    <ClCompile Include="c\shader.cpp" />
+    <ClCompile Include="c\shaders\shader.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{9C33118F-CE7B-4CB2-90CF-0DD42FAE7798}</ProjectGuid>

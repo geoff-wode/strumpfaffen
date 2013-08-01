@@ -3,11 +3,9 @@
 
 #include <string>
 #include <boost/shared_ptr.hpp>
-#include <terrene/h/shaderX/shader.h>
 
-namespace Terrene
+namespace Geometry
 {
-
 	class IModel
 	{
 	public:

@@ -11,18 +11,18 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{F0C0FA29-52DC-4BB9-8D87-27D2E0A5BC6B}</ProjectGuid>
+    <ProjectGuid>{C07B9F65-ECE4-4203-A2EE-4A3E72722E94}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>pluto</RootNamespace>
+    <RootNamespace>Framework</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
@@ -38,66 +38,29 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(ProjectDir)h;$(SolutionDir);$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)lib\$(Configuration);$(LibraryPath)</LibraryPath>
-    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)lib\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)intermediate\$(ProjectName)\$(Configuration)\</IntDir>
-    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
+    <IncludePath>$(ProjectDir)include;$(SolutionDir);$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)lib\$(Configuration);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)lib\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)intermediate\$(ProjectName)\$(Configuration)\</IntDir>
+    <IncludePath>$(ProjectDir)include;$(SolutionDir);$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)lib\$(Configuration);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>ENABLE_DEBUG;_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>gl_loader.lib;terrene.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <IgnoreSpecificDefaultLibraries>msvcrt.lib</IgnoreSpecificDefaultLibraries>
     </Link>
-    <PostBuildEvent>
-      <Command>@echo off
-
-if exist $(SDL_DIR)lib\x86\SDL.dll (
-  echo Copying SDL runtime...
-  xcopy $(SDL_DIR)lib\x86\SDL.dll $(OutDir) /r/y
-  if errorlevel 1 goto OnFault
-)
-
-if exist $(ProjectDir)shaders\ (
-  echo Copying program shader files...
-  xcopy $(ProjectDir)shaders $(OutDir)shaders /s/i/r/y/c
-  if errorlevel 1 goto OnFault
-)
-
-if exist $(ProjectDir)models (
-  echo Copying program model files...
-  xcopy $(ProjectDir)models $(OutDir)models /s/i/r/y/c
-  if errorlevel 1 goto OnFault
-)
-
-if exist $(ProjectDir)images (
-  echo Copying program image files...
-  xcopy $(ProjectDir)images $(OutDir)images /s/i/r/y/c
-  if errorlevel 1 goto OnFault
-)
-
-goto OnOkay
-
-:OnFault
-echo Build post-step for $(ProjectName) failed.
-exit
-
-:OnOkay
-echo Build post-step for $(ProjectName) complete.
-</Command>
-    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -107,7 +70,7 @@ echo Build post-step for $(ProjectName) complete.
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -117,7 +80,33 @@ echo Build post-step for $(ProjectName) complete.
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="c\main.cpp" />
+    <ClInclude Include="include\buffers\bufferusagehint.h" />
+    <ClInclude Include="include\buffers\indexbuffer.h" />
+    <ClInclude Include="include\buffers\vertexbuffer.h" />
+    <ClInclude Include="include\core\clearstate.h" />
+    <ClInclude Include="include\core\vertexdeclaration.h" />
+    <ClInclude Include="include\core\vertexelement.h" />
+    <ClInclude Include="include\core\vertexpositionnormaltexture.h" />
+    <ClInclude Include="include\util\debug.h" />
+    <ClInclude Include="include\core\device.h" />
+    <ClInclude Include="include\core\program.h" />
+    <ClInclude Include="include\core\viewport.h" />
+    <ClInclude Include="include\geometry\model.h" />
+    <ClInclude Include="include\input\keyboard.h" />
+    <ClInclude Include="include\input\keystate.h" />
+    <ClInclude Include="include\util\files.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\core\vertexdeclaration.cpp" />
+    <ClCompile Include="src\buffers\indexbuffer.cpp" />
+    <ClCompile Include="src\buffers\vertexbuffer.cpp" />
+    <ClCompile Include="src\core\device.cpp" />
+    <ClCompile Include="src\core\program.cpp" />
+    <ClCompile Include="src\core\vertexelement.cpp" />
+    <ClCompile Include="src\core\viewport.cpp" />
+    <ClCompile Include="src\geometry\model.cpp" />
+    <ClCompile Include="src\input\keyboard.cpp" />
+    <ClCompile Include="src\util\files.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

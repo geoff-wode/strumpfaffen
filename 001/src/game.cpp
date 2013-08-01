@@ -13,49 +13,6 @@ static void HandleInput(bool* keepRunning);
 
 //----------------------------------------------------------
 
-const glm::vec3 positions[] =
-{
-    glm::vec3(-1.0f,-1.0f,-1.0f),
-    glm::vec3(-1.0f,-1.0f, 1.0f),
-    glm::vec3(-1.0f, 1.0f, 1.0f),
-    glm::vec3(1.0f, 1.0f,-1.0f),
-    glm::vec3(-1.0f,-1.0f,-1.0f),
-    glm::vec3(-1.0f, 1.0f,-1.0f),
-    glm::vec3(1.0f,-1.0f, 1.0f),
-    glm::vec3(-1.0f,-1.0f,-1.0f),
-    glm::vec3(1.0f,-1.0f,-1.0f),
-    glm::vec3(1.0f, 1.0f,-1.0f),
-    glm::vec3(1.0f,-1.0f,-1.0f),
-    glm::vec3(-1.0f,-1.0f,-1.0f),
-    glm::vec3(-1.0f,-1.0f,-1.0f),
-    glm::vec3(-1.0f, 1.0f, 1.0f),
-    glm::vec3(-1.0f, 1.0f,-1.0f),
-    glm::vec3(1.0f,-1.0f, 1.0f),
-    glm::vec3(-1.0f,-1.0f, 1.0f),
-    glm::vec3(-1.0f,-1.0f,-1.0f),
-    glm::vec3(-1.0f, 1.0f, 1.0f),
-    glm::vec3(-1.0f,-1.0f, 1.0f),
-    glm::vec3(1.0f,-1.0f, 1.0f),
-    glm::vec3(1.0f, 1.0f, 1.0f),
-    glm::vec3(1.0f,-1.0f,-1.0f),
-    glm::vec3(1.0f, 1.0f,-1.0f),
-    glm::vec3(1.0f,-1.0f,-1.0f),
-    glm::vec3(1.0f, 1.0f, 1.0f),
-    glm::vec3(1.0f,-1.0f, 1.0f),
-    glm::vec3(1.0f, 1.0f, 1.0f),
-    glm::vec3(1.0f, 1.0f,-1.0f),
-    glm::vec3(-1.0f, 1.0f,-1.0f),
-    glm::vec3(1.0f, 1.0f, 1.0f),
-    glm::vec3(-1.0f, 1.0f,-1.0f),
-    glm::vec3(-1.0f, 1.0f, 1.0f),
-    glm::vec3(1.0f, 1.0f, 1.0f),
-    glm::vec3(-1.0f, 1.0f, 1.0f),
-    glm::vec3(1.0f,-1.0f, 1.0f)
-};
-const unsigned int triangleCount = sizeof(positions) / sizeof(positions[0]);
-
-//----------------------------------------------------------
-
 Game::Game()
 	: running(true)
 {
