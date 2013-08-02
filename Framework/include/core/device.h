@@ -29,6 +29,9 @@ namespace Core
 		Viewport	GetViewport() const;
 		void SetViewport(const Viewport& value);
 
+		glm::mat4 ViewMatrix;
+		glm::mat4 ProjectionMatrix;
+
 	private:
 		struct DeviceImpl;
 		boost::scoped_ptr<DeviceImpl> impl;
