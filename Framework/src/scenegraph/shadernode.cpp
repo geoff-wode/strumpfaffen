@@ -17,7 +17,7 @@ ShaderNodeClass::~ShaderNodeClass()
 
 void ShaderNodeClass::LoadResources(Scene* const scene)
 {
-	shader = Shaders::ShaderClass::Load(filename);
+	shader = Graphics::IShader::Load(filename);
 }
 
 bool ShaderNodeClass::PreRender(Scene* const scene)
@@ -29,7 +29,7 @@ bool ShaderNodeClass::PreRender(Scene* const scene)
 	return true;
 }
 
-Shaders::Shader ShaderNodeClass::GetShader() const
+Graphics::Shader ShaderNodeClass::GetShader() const
 {
 	return shader;
 }

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -97,6 +97,8 @@
     <ClInclude Include="include\scenegraph\transformnode.h" />
     <ClInclude Include="include\shaders\shader.h" />
     <ClInclude Include="include\shaders\shaderblock.h" />
+    <ClInclude Include="include\shaders\shaderblockparam.h" />
+    <ClInclude Include="include\shaders\shaderparam.h" />
     <ClInclude Include="include\shaders\shaderparameter.h" />
     <ClInclude Include="include\shaders\shaderparaminterface.h" />
     <ClInclude Include="include\util\debug.h" />
@@ -108,10 +110,8 @@
     <ClInclude Include="include\input\keystate.h" />
     <ClInclude Include="include\util\files.h" />
     <ClInclude Include="include\util\utils.h" />
-    <ClInclude Include="src\shaders\blockparamimpl.h" />
     <ClInclude Include="src\shaders\blocks\shaderblockimpl.h" />
     <ClInclude Include="include\shaders\shader.h" />
-    <ClInclude Include="src\shaders\paramimpl.h" />
     <ClInclude Include="src\shaders\shaderimpl.h" />
   </ItemGroup>
   <ItemGroup>
@@ -132,7 +132,7 @@
     <ClCompile Include="src\scenegraph\shadernode.cpp" />
     <ClCompile Include="src\scenegraph\transformnode.cpp" />
     <ClCompile Include="src\shaders\shader.cpp" />
-    <ClCompile Include="src\shaders\param.cpp" />
+    <ClCompile Include="src\shaders\shaderparam.cpp" />
     <ClCompile Include="src\util\files.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

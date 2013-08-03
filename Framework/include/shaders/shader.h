@@ -1,23 +1,27 @@
-#if ! defined(__SHADER_H__)
-#define __SHADER_H__
+#if ! defined(__SHADERS_H__)
+#define __SHADERS_H__
 
 #include <string>
+#include <vector>
 #include <boost/shared_ptr.hpp>
-#include <shaders/shaderparameter.h>
+#include <shaders/shaderparaminterface.h>
 
-namespace Shaders
+namespace Graphics
 {
-	typedef boost::shared_ptr<class ShaderClass> Shader;
+	typedef boost::shared_ptr<class IShader> Shader;
+	typedef std::vector<ShaderParamPtr> ShaderParamList;
 
-	class ShaderClass
+	class IShader
 	{
 	public:
-		static Shader Load(const std::string& filename);
+		static Shader Load(const std::string& name);
 
-		virtual ShaderParameter* const GetParameter(const std::string& name) const = 0;
-
+		virtual const ShaderParamList& GetParams() const = 0;
 		virtual void Apply() = 0;
+
+	protected:
+		~IShader() { }
 	};
 }
 
-#endif // __SHADER_H__
+#endif

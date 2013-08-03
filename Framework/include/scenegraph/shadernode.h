@@ -19,11 +19,11 @@ namespace SceneGraph
 		virtual void LoadResources(Scene* const scene);
 		virtual bool PreRender(Scene* const scene);
 
-		Shaders::Shader GetShader() const;
+		Graphics::Shader GetShader() const;
 
 	private:
 		std::string filename;
-		Shaders::Shader shader;
+		Graphics::Shader shader;
 	};
 
 	typedef boost::shared_ptr<ShaderNodeClass> ShaderNode;
