@@ -86,9 +86,7 @@
     <ClInclude Include="include\buffers\vertexbuffer.h" />
     <ClInclude Include="include\core\clearstate.h" />
     <ClInclude Include="include\core\contentmanager.h" />
-    <ClInclude Include="include\core\vertexdeclaration.h" />
-    <ClInclude Include="include\core\vertexelement.h" />
-    <ClInclude Include="include\core\vertexpositionnormaltexture.h" />
+    <ClInclude Include="include\geometry\mesh.h" />
     <ClInclude Include="include\scenegraph\camera.h" />
     <ClInclude Include="include\scenegraph\meshnode.h" />
     <ClInclude Include="include\scenegraph\scene.h" />
@@ -103,12 +101,16 @@
     <ClInclude Include="include\core\device.h" />
     <ClInclude Include="include\core\program.h" />
     <ClInclude Include="include\core\viewport.h" />
-    <ClInclude Include="include\geometry\model.h" />
     <ClInclude Include="include\input\keyboard.h" />
     <ClInclude Include="include\input\keystate.h" />
     <ClInclude Include="include\util\files.h" />
     <ClInclude Include="include\util\utils.h" />
+    <ClCompile Include="src\buffers\vertexbuffer.cpp">
+      <FileType>CppHeader</FileType>
+    </ClCompile>
+    <ClInclude Include="include\geometry\vertexdeclaration.h" />
     <ClInclude Include="src\shaders\blocks\shaderblockimpl.h" />
+    <ClCompile Include="src\geometry\new\geo.cpp" />
     <ClCompile Include="src\shaders\shader.cpp">
       <FileType>CppHeader</FileType>
     </ClCompile>
@@ -118,14 +120,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\buffers\shaderuniformbuffer.cpp" />
-    <ClCompile Include="src\core\vertexdeclaration.cpp" />
     <ClCompile Include="src\buffers\indexbuffer.cpp" />
-    <ClCompile Include="src\buffers\vertexbuffer.cpp" />
     <ClCompile Include="src\core\device.cpp" />
     <ClCompile Include="src\core\program.cpp" />
-    <ClCompile Include="src\core\vertexelement.cpp" />
     <ClCompile Include="src\core\viewport.cpp" />
-    <ClCompile Include="src\geometry\model.cpp" />
     <ClCompile Include="src\input\keyboard.cpp" />
     <ClCompile Include="src\scenegraph\camera.cpp" />
     <ClCompile Include="src\scenegraph\meshnode.cpp" />

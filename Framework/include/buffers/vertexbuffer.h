@@ -3,37 +3,22 @@
 
 #include <boost/shared_ptr.hpp>
 #include <buffers/bufferusagehint.h>
-#include <core/vertexdeclaration.h>
 
 namespace Buffers
 {
 
-	class IVertexBuffer
+	struct IVertexBuffer
 	{
-	public:
-		virtual void SetData(const void* const data, size_t vertexCount, size_t offset) const = 0;
-
-		virtual void GetData(void* const data, size_t vertexCount, size_t offset) const = 0;
-
-		virtual void Activate() const = 0;
-		virtual void Deactivate() const = 0;
-
-		// Returns the maximum number of vertices that can be stored in the buffer.
-		virtual size_t VertexCount() const = 0;
-
-		// Returns the vertex declaration associated with this buffer.
-		virtual const Core::VertexDeclaration& VertexDeclaration() const = 0;
-
-	protected:
-		~IVertexBuffer();
+		virtual void SetData(const void* const data, size_t size, size_t offset) = 0;
+		virtual void GetData(void* const data, size_t size, size_t offset) const = 0;
+		virtual void Enable() const = 0;
+		virtual void Disable() const = 0;
+		virtual size_t Size() const = 0;
 	};
 
 	typedef boost::shared_ptr<IVertexBuffer> VertexBuffer;
 
-	VertexBuffer CreateVertexBuffer(
-		const Core::VertexDeclaration& vertexDeclaration,
-		size_t vertexCount,
-		UsageHint::Enum usageHint);
+	VertexBuffer CreateVertexBuffer(size_t size, Buffers::UsageHint::Enum usage);
 
 }
 

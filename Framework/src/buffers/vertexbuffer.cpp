@@ -1,99 +1,49 @@
-#include <gl_loader/gl_loader.h>
 #include <buffers/vertexbuffer.h>
-#include <util/debug.h>
+#include <gl_loader/gl_loader.h>
 
 using namespace Buffers;
 
-//-----------------------------------------------------------------------
-
-IVertexBuffer::~IVertexBuffer()
+struct VertexBufferImpl : public IVertexBuffer
 {
-}
+	size_t size;
+	GLuint handle;
 
-//-----------------------------------------------------------------------
-
-class VertexBufferImpl : public IVertexBuffer
-{
-public:
-	VertexBufferImpl(const Core::VertexDeclaration& vertexDeclaration, size_t vertexCount)
-		: vertexCount(vertexCount), vertexDeclaration(vertexDeclaration)
-	{
-		glGenBuffers(1, &handle);
-	}
-
-	virtual ~VertexBufferImpl()
+	~VertexBufferImpl()
 	{
 		glDeleteBuffers(1, &handle);
 	}
 
-	virtual void SetData(const void* const data, size_t vertexCount, size_t startVertex) const
+	virtual void SetData(const void* const data, size_t size, size_t offset)
 	{
-		ASSERT((vertexCount + startVertex) <= this->VertexCount());
-
-		const size_t vertexStride = vertexDeclaration.VertexStride();
-		const size_t offset = startVertex * vertexStride;
-		const size_t dataLength = vertexCount * vertexStride;
-
-		Activate();
-		glBufferSubData(GL_ARRAY_BUFFER, offset, dataLength, data);
-		Deactivate();
+		Enable();
+		glBufferSubData(GL_ARRAY_BUFFER, offset, size, data);
+		Disable();
 	}
 
-	virtual void GetData(void* const data, size_t vertexCount, size_t startVertex) const
+	virtual void GetData(void* const data, size_t size, size_t offset) const
 	{
-		ASSERT((vertexCount + startVertex) <= this->VertexCount());
-
-		const size_t vertexStride = vertexDeclaration.VertexStride();
-		const size_t offset = startVertex * vertexStride;
-		const size_t dataLength = vertexCount * vertexStride;
-
-		glGetBufferSubData(GL_ARRAY_BUFFER, offset, dataLength, data);
+		Enable();
+		glGetBufferSubData(GL_ARRAY_BUFFER, offset, size, data);
+		Disable();
 	}
 
-	virtual void Activate() const
-	{
-		glBindBuffer(GL_ARRAY_BUFFER, handle);
-	}
+	virtual void Enable() const { glBindBuffer(GL_ARRAY_BUFFER, handle); }
 
-	virtual void Deactivate() const
-	{
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-	}
+	virtual void Disable() const{ glBindBuffer(GL_ARRAY_BUFFER, 0); }
 
-	virtual size_t VertexCount() const
-	{
-		return vertexCount;
-	}
-
-	virtual const Core::VertexDeclaration& VertexDeclaration() const
-	{
-		return vertexDeclaration;
-	}
-
-	size_t vertexCount;
-	Core::VertexDeclaration vertexDeclaration;
-	GLuint handle;
+	virtual size_t Size() const { return size; }
 };
 
-//-----------------------------------------------------------------------
-
-VertexBuffer Buffers::CreateVertexBuffer(
-		const Core::VertexDeclaration& vertexDeclaration,
-		size_t vertexCount,
-		UsageHint::Enum usageHint)
+VertexBuffer Buffers::CreateVertexBuffer(size_t size, Buffers::UsageHint::Enum usage)
 {
-	VertexBuffer vb(new VertexBufferImpl(vertexDeclaration, vertexCount));
-	const size_t bufferSize = vertexDeclaration.VertexStride() * vertexCount;
-	if (vb)
+	boost::shared_ptr<VertexBufferImpl> vb(new VertexBufferImpl());
+	vb->Enable();
+	switch (usage)
 	{
-		vb->Activate();
-		switch (usageHint)
-		{
-		case UsageHint::Static: glBufferData(GL_ARRAY_BUFFER, bufferSize, NULL, GL_STATIC_DRAW); break;
-		case UsageHint::Dynamic: glBufferData(GL_ARRAY_BUFFER, bufferSize, NULL, GL_DYNAMIC_DRAW); break;
-		case UsageHint::Streaming: glBufferData(GL_ARRAY_BUFFER, bufferSize, NULL, GL_STREAM_DRAW); break;
-		}
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
+	case Buffers::UsageHint::Static: glBufferData(GL_ARRAY_BUFFER, size, NULL, GL_STATIC_DRAW); break;
+	case Buffers::UsageHint::Dynamic: glBufferData(GL_ARRAY_BUFFER, size, NULL, GL_DYNAMIC_DRAW); break;
+	case Buffers::UsageHint::Streaming: glBufferData(GL_ARRAY_BUFFER, size, NULL, GL_STREAM_DRAW); break;
 	}
+	vb->Disable();
 	return vb;
 }

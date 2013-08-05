@@ -5,7 +5,7 @@
 
 #include <string>
 #include <scenegraph/transformnode.h>
-#include <geometry/model.h>
+#include <geometry/mesh.h>
 
 namespace SceneGraph
 {
@@ -21,7 +21,7 @@ namespace SceneGraph
 
 	private:
 		std::string filename;
-		Geometry::Model model;
+		Geometry::Mesh mesh;
 	};
 
 	typedef boost::shared_ptr<MeshNodeClass> MeshNode;

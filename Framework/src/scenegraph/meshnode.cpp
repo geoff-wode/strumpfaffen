@@ -16,15 +16,15 @@ MeshNodeClass::~MeshNodeClass()
 
 void MeshNodeClass::LoadResources(Scene* const scene)
 {
-	model = Geometry::LoadModel(filename);
+	mesh = Geometry::LoadMesh(filename);
 }
 
 bool MeshNodeClass::PreRender(Scene* const scene)
 {
-	return model;
+	return mesh;
 }
 
 void MeshNodeClass::Render(Scene* const scene)
 {
-	model->Render();
+	mesh->Render();
 }

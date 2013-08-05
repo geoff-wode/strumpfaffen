@@ -4,7 +4,7 @@
 #include <util/debug.h>
 #include <core/program.h>
 #include <input/keyboard.h>
-#include <geometry/model.h>
+#include <geometry/mesh.h>
 #include <scenegraph/scene.h>
 #include <scenegraph/camera.h>
 #include <scenegraph/meshnode.h>
