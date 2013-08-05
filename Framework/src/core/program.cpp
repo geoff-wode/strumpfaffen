@@ -1,7 +1,7 @@
 #include <SDL.h>
 #include <stdlib.h>
 #include <stddef.h>
-
+#include <time.h>
 #include <util/debug.h>
 #include <core/program.h>
 
@@ -59,6 +59,12 @@ void Program::Run()
 {
 	SDL_Init(SDL_INIT_EVERYTHING);
 	atexit(SDL_Quit);
+
+	time_t now = time(NULL);
+	struct tm* utcTime = localtime(&now);
+	char buffer[128] = { 0 };
+	strftime(buffer, sizeof(buffer)-1, "%Y-%m-%d at %H:%M:%S", utcTime);
+	LOG("System start: %s\n", buffer);
 
 	if (!Device->Initialise()) { return; }
 

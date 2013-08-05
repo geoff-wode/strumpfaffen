@@ -163,6 +163,8 @@ echo Build post-step for $(ProjectName) complete.
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="shaders\common.glsl" />
+    <None Include="shaders\simplest\fs.glsl" />
     <None Include="shaders\simplest\vs.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -14,7 +14,8 @@ bool File::Load(const std::string& filename, std::vector<char>& content)
 	if (NULL != in)
 	{
 		fseek(in, 0, SEEK_END);
-		content.resize(ftell(in));
+		const long size = ftell(in);
+		content.resize(size);
 		rewind(in);
 		fread(content.data(), sizeof(char), content.size(), in);
 		fclose(in);

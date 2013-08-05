@@ -1,12 +1,12 @@
 #if ! defined(__UNIFORM_BLOCK_H__)
 #define __UNIFORM_BLOCK_H__
 
-#include <gl_loader/gl_loader.h>
 #include <vector>
 #include <memory>
-#include "uniform.h"
-#include "uniformimpl.h"
+#include <gl_loader/gl_loader.h>
 #include <buffers/shaderuniformbuffer.h>
+#include <shaders/uniform.h>
+#include "uniformimpl.h"
 
 struct UniformBlock
 {

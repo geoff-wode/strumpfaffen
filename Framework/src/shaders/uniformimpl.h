@@ -9,8 +9,8 @@
 #include <vector>
 #include <string>
 #include <gl_loader/gl_loader.h>
-#include "shader.h"
-#include "uniform.h"
+#include <shaders/shader.h>
+#include <shaders/uniform.h>
 
 struct UniformImpl : public Graphics::ShaderUniform
 {

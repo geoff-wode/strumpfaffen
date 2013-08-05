@@ -40,8 +40,8 @@ protected:
 		SceneGraph::CameraNode cameraNode(new SceneGraph::CameraNodeClass());
 
 		SceneGraph::TransformNode monkeyNode(new SceneGraph::TransformNodeClass());
-		SceneGraph::ShaderNode monkeyShader(new SceneGraph::ShaderNodeClass("shaders//monkeyShader"));
-		SceneGraph::MeshNode monkeyMesh(new SceneGraph::MeshNodeClass("models//monkey.obj"));
+		SceneGraph::ShaderNode monkeyShader(new SceneGraph::ShaderNodeClass("shaders/simplest"));
+		SceneGraph::MeshNode monkeyMesh(new SceneGraph::MeshNodeClass("models/monkey.obj"));
 		monkeyNode->Children.push_back(monkeyShader);
 		monkeyNode->Children.push_back(monkeyMesh);
 		monkeyNode->SetTransform(glm::translate(glm::mat4(1), glm::vec3(0,0,-20)));

@@ -1,27 +1,23 @@
-#if ! defined(__SHADERS_H__)
-#define __SHADERS_H__
+// Declares the interface to a shader program.
+
+#if ! defined(__SHADER_H__)
+#define __SHADER_H__
 
 #include <string>
-#include <vector>
 #include <boost/shared_ptr.hpp>
-#include <shaders/shaderparaminterface.h>
+#include <shaders/uniform.h>
 
 namespace Graphics
 {
-	typedef boost::shared_ptr<class IShader> Shader;
-	typedef std::vector<ShaderParamPtr> ShaderParamList;
-
-	class IShader
+	struct IShader
 	{
-	public:
-		static Shader Load(const std::string& name);
-
-		virtual const ShaderParamList& GetParams() const = 0;
+		virtual ShaderUniform* const GetUniform(const std::string& name) const = 0;
 		virtual void Apply() = 0;
-
-	protected:
-		~IShader() { }
 	};
+
+	typedef boost::shared_ptr<IShader>	Shader;
+
+	Shader LoadShader(const std::string& name);
 }
 
-#endif
+#endif // __SHADER_H__
