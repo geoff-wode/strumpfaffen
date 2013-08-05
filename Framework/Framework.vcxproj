@@ -111,6 +111,14 @@
     <ClInclude Include="src\shaders\blockparamimpl.h" />
     <ClInclude Include="src\shaders\blocks\shaderblockimpl.h" />
     <ClInclude Include="include\shaders\shader.h" />
+    <ClCompile Include="src\shaders\new\shader.cpp">
+      <FileType>CppHeader</FileType>
+    </ClCompile>
+    <ClInclude Include="src\shaders\new\shader.h" />
+    <ClInclude Include="src\shaders\new\shaderimpl.h" />
+    <ClInclude Include="src\shaders\new\uniform.h" />
+    <ClInclude Include="src\shaders\new\uniformblock.h" />
+    <ClInclude Include="src\shaders\new\uniformimpl.h" />
     <ClInclude Include="src\shaders\paramimpl.h" />
     <ClInclude Include="src\shaders\shaderimpl.h" />
   </ItemGroup>
@@ -131,6 +139,7 @@
     <ClCompile Include="src\scenegraph\scenenode.cpp" />
     <ClCompile Include="src\scenegraph\shadernode.cpp" />
     <ClCompile Include="src\scenegraph\transformnode.cpp" />
+    <ClCompile Include="src\shaders\blockparam.cpp" />
     <ClCompile Include="src\shaders\shader.cpp" />
     <ClCompile Include="src\shaders\param.cpp" />
     <ClCompile Include="src\util\files.cpp" />
