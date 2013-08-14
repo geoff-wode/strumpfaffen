@@ -39,6 +39,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(SolutionDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -49,12 +50,49 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PostBuildEvent>
+      <Command>@echo off
+
+if exist $(SDL_DIR)lib\x86\SDL.dll (
+  echo Copying SDL runtime...
+  xcopy $(SDL_DIR)lib\x86\SDL.dll $(OutDir) /r/y
+  if errorlevel 1 goto OnFault
+)
+
+if exist $(ProjectDir)shaders\ (
+  echo Copying program shader files...
+  xcopy $(ProjectDir)shaders $(OutDir)shaders /s/i/r/y/c
+  if errorlevel 1 goto OnFault
+)
+
+if exist $(ProjectDir)models (
+  echo Copying program model files...
+  xcopy $(ProjectDir)models $(OutDir)models /s/i/r/y/c
+  if errorlevel 1 goto OnFault
+)
+
+if exist $(ProjectDir)images (
+  echo Copying program image files...
+  xcopy $(ProjectDir)images $(OutDir)images /s/i/r/y/c
+  if errorlevel 1 goto OnFault
+)
+
+goto OnOkay
+
+:OnFault
+echo Build post-step for $(ProjectName) failed.
+exit
+
+:OnOkay
+echo Build post-step for $(ProjectName) complete.
+</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -74,7 +112,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="files.cpp" />
     <ClCompile Include="main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="debug.h" />
+    <ClInclude Include="files.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\common.glsl" />
+    <None Include="shaders\simple\fs.glsl" />
+    <None Include="shaders\simple\vs.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

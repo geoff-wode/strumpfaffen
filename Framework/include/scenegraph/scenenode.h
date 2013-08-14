@@ -7,17 +7,12 @@
 
 namespace SceneGraph
 {
-
 	class Scene;
 
-	typedef boost::shared_ptr<class SceneNodeClass> SceneNode;
-	typedef std::list<SceneNode> NodeList;
-
-	class SceneNodeClass
+	class SceneNode
 	{
 	public:
-		SceneNodeClass();
-		virtual ~SceneNodeClass();
+		virtual ~SceneNode();
 
 		// Causes all child nodes to be rendered.
 		virtual void RenderChildren(Scene* const scene);
@@ -27,7 +22,7 @@ namespace SceneGraph
 		virtual void LoadResources(Scene* const scene);
 
 		// Enables this and all child nodes to update internal state.
-		virtual void Update(unsigned int elapsedMS, Scene* const scene);
+		virtual void Update(Scene* const scene, unsigned int elapsedMS);
 
 		// Perform tasks which must complete before the node is rendered, such
 		// as visibility tests, etc.
@@ -44,7 +39,12 @@ namespace SceneGraph
 		virtual void SetTransform(const glm::mat4& toWorld);
 		virtual void SetTransform(const glm::mat4& toWorld, const glm::mat4& fromWorld);
 
+		typedef boost::shared_ptr<SceneNode> SceneNodePtr;
+		typedef std::list<SceneNodePtr> NodeList;
 		NodeList	Children;
+
+	protected:
+		SceneNode();
 	};
 
 }

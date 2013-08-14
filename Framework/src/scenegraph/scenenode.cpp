@@ -4,11 +4,11 @@ using namespace SceneGraph;
 
 //-----------------------------------------------------------------------
 
-SceneNodeClass::SceneNodeClass()
+SceneNode::SceneNode()
 {
 }
 
-SceneNodeClass::~SceneNodeClass()
+SceneNode::~SceneNode()
 {
 	while (!Children.empty())
 	{
@@ -16,11 +16,11 @@ SceneNodeClass::~SceneNodeClass()
 	}
 }
 
-void SceneNodeClass::RenderChildren(Scene* const scene)
+void SceneNode::RenderChildren(Scene* const scene)
 {
 	for (NodeList::iterator i = Children.begin(); i != Children.end(); ++i)
 	{
-		SceneNode node = *i;
+		boost::shared_ptr<class SceneNode> node = *i;
 		if (node->PreRender(scene))
 		{
 			node->Render(scene);
@@ -30,41 +30,41 @@ void SceneNodeClass::RenderChildren(Scene* const scene)
 	}
 }
 
-void SceneNodeClass::LoadResources(Scene* const scene)
+void SceneNode::LoadResources(Scene* const scene)
 {
 	for (NodeList::iterator i = Children.begin(); i != Children.end(); ++i)
 	{
-		SceneNode node = *i;
+		boost::shared_ptr<class SceneNode> node = *i;
 		node->LoadResources(scene);
 	}
 }
 
-void SceneNodeClass::Update(unsigned int elapsedMS, Scene* const scene)
+void SceneNode::Update(Scene* const scene, unsigned int elapsedMS)
 {
 	for (NodeList::iterator i = Children.begin(); i != Children.end(); ++i)
 	{
-		SceneNode node = *i;
-		node->Update(elapsedMS, scene);
+		boost::shared_ptr<class SceneNode> node = *i;
+		node->Update(scene, elapsedMS);
 	}
 }
 
-bool SceneNodeClass::PreRender(Scene* const scene)
+bool SceneNode::PreRender(Scene* const scene)
 {
 	return true;
 }
 
-void SceneNodeClass::Render(Scene* const scene)
+void SceneNode::Render(Scene* const scene)
 {
 }
 
-void SceneNodeClass::PostRender(Scene* const scene)
+void SceneNode::PostRender(Scene* const scene)
 {
 }
 
-void SceneNodeClass::SetTransform(const glm::mat4& toWorld)
+void SceneNode::SetTransform(const glm::mat4& toWorld)
 {
 }
 
-void SceneNodeClass::SetTransform(const glm::mat4& toWorld, const glm::mat4& fromWorld)
+void SceneNode::SetTransform(const glm::mat4& toWorld, const glm::mat4& fromWorld)
 {
 }

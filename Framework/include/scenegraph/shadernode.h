@@ -6,27 +6,30 @@
 #include <vector>
 #include <string>
 #include <scenegraph/scenenode.h>
-#include <shaders/shader.h>
+#include <gl_loader/gl_loader.h>
+#include <shaders/uniform.h>
 
 namespace SceneGraph
 {
-	class ShaderNodeClass : public SceneNodeClass
+	class ShaderNode : public SceneNode
 	{
 	public:
-		ShaderNodeClass(const std::string& filename);
-		virtual ~ShaderNodeClass();
+		static boost::shared_ptr<ShaderNode> Create(const std::string& filename);
+
+		virtual ~ShaderNode();
 
 		virtual void LoadResources(Scene* const scene);
-		virtual bool PreRender(Scene* const scene);
 
-		Graphics::Shader GetShader() const;
+		virtual void Render(Scene* const scene);
+
+		const Graphics::ShaderUniformList& GetUniforms() const { return uniforms; }
 
 	private:
+		ShaderNode(const std::string& filename);
 		std::string filename;
-		Graphics::Shader shader;
+		GLuint program;
+		Graphics::ShaderUniformList uniforms;
 	};
-
-	typedef boost::shared_ptr<ShaderNodeClass> ShaderNode;
 }
 
 #endif // __SHADER_NODE_H__

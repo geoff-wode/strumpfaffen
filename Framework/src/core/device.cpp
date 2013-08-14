@@ -1,7 +1,7 @@
 #include <SDL.h>
 #include <exception>
 #include <gl_loader/gl_loader.h>
-
+#include <glm/glm.hpp>
 #include <util/debug.h>
 #include <core/device.h>
 

@@ -80,58 +80,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="include\buffers\bufferusagehint.h" />
-    <ClInclude Include="include\buffers\indexbuffer.h" />
-    <ClInclude Include="include\buffers\shaderuniformbuffer.h" />
-    <ClInclude Include="include\buffers\vertexbuffer.h" />
-    <ClInclude Include="include\core\clearstate.h" />
-    <ClInclude Include="include\core\contentmanager.h" />
-    <ClInclude Include="include\geometry\mesh.h" />
-    <ClInclude Include="include\scenegraph\camera.h" />
-    <ClInclude Include="include\scenegraph\meshnode.h" />
-    <ClInclude Include="include\scenegraph\scene.h" />
-    <ClInclude Include="include\scenegraph\scenenode.h" />
-    <ClInclude Include="include\scenegraph\shadernode.h" />
-    <ClInclude Include="include\scenegraph\transformnode.h" />
-    <ClInclude Include="include\shaders\shader.h" />
     <ClInclude Include="include\shaders\shaderblock.h" />
     <ClInclude Include="include\shaders\shaderparameter.h" />
-    <ClInclude Include="include\shaders\uniform.h" />
-    <ClInclude Include="include\util\debug.h" />
-    <ClInclude Include="include\core\device.h" />
-    <ClInclude Include="include\core\program.h" />
-    <ClInclude Include="include\core\viewport.h" />
-    <ClInclude Include="include\input\keyboard.h" />
-    <ClInclude Include="include\input\keystate.h" />
-    <ClInclude Include="include\util\files.h" />
-    <ClInclude Include="include\util\utils.h" />
-    <ClCompile Include="src\buffers\vertexbuffer.cpp">
-      <FileType>CppHeader</FileType>
-    </ClCompile>
-    <ClInclude Include="include\geometry\vertexdeclaration.h" />
     <ClInclude Include="src\shaders\blocks\shaderblockimpl.h" />
-    <ClCompile Include="src\geometry\new\geo.cpp" />
-    <ClCompile Include="src\shaders\shader.cpp">
-      <FileType>CppHeader</FileType>
-    </ClCompile>
-    <ClInclude Include="src\shaders\shaderimpl.h" />
-    <ClInclude Include="src\shaders\uniformblock.h" />
-    <ClInclude Include="src\shaders\uniformimpl.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="src\buffers\shaderuniformbuffer.cpp" />
-    <ClCompile Include="src\buffers\indexbuffer.cpp" />
-    <ClCompile Include="src\core\device.cpp" />
-    <ClCompile Include="src\core\program.cpp" />
-    <ClCompile Include="src\core\viewport.cpp" />
-    <ClCompile Include="src\input\keyboard.cpp" />
-    <ClCompile Include="src\scenegraph\camera.cpp" />
-    <ClCompile Include="src\scenegraph\meshnode.cpp" />
-    <ClCompile Include="src\scenegraph\scene.cpp" />
-    <ClCompile Include="src\scenegraph\scenenode.cpp" />
-    <ClCompile Include="src\scenegraph\shadernode.cpp" />
-    <ClCompile Include="src\scenegraph\transformnode.cpp" />
-    <ClCompile Include="src\util\files.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -5,16 +5,16 @@ using namespace SceneGraph;
 
 //------------------------------------------------------------------------------------
 
-TransformNodeClass::TransformNodeClass()
+TransformNode::TransformNode()
 	: ToWorld(1), FromWorld(1)
 {
 }
 
-TransformNodeClass::~TransformNodeClass()
+TransformNode::~TransformNode()
 {
 }
 
-bool TransformNodeClass::PreRender(Scene* const scene)
+bool TransformNode::PreRender(Scene* const scene)
 {
 	if (!scene->MatrixStack.empty())
 	{
@@ -24,10 +24,10 @@ bool TransformNodeClass::PreRender(Scene* const scene)
 	{
 		scene->MatrixStack.push(ToWorld);
 	}
-	return SceneNodeClass::PreRender(scene);
+	return SceneNode::PreRender(scene);
 }
 
-void TransformNodeClass::PostRender(Scene* const scene)
+void TransformNode::PostRender(Scene* const scene)
 {
 	if (!scene->MatrixStack.empty())
 	{
@@ -35,12 +35,12 @@ void TransformNodeClass::PostRender(Scene* const scene)
 	}
 }
 
-void TransformNodeClass::SetTransform(const glm::mat4& toWorld)
+void TransformNode::SetTransform(const glm::mat4& toWorld)
 {
 	SetTransform(toWorld, glm::inverse(toWorld));
 }
 
-void TransformNodeClass::SetTransform(const glm::mat4& toWorld, const glm::mat4& fromWorld)
+void TransformNode::SetTransform(const glm::mat4& toWorld, const glm::mat4& fromWorld)
 {
 	ToWorld = toWorld;
 	FromWorld = fromWorld;

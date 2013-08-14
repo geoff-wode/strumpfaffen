@@ -5,15 +5,22 @@
 
 namespace SceneGraph
 {
-	class CameraNodeClass : public TransformNodeClass
+	class CameraNode : public TransformNode
 	{
 	public:
-		CameraNodeClass();
-		virtual ~CameraNodeClass();
-		virtual void Update(unsigned int elapsedMS, Scene* const scene);
-	};
+		static boost::shared_ptr<CameraNode> Create();
 
-	typedef boost::shared_ptr<CameraNodeClass> CameraNode;
+		virtual ~CameraNode();
+
+		virtual void Update(Scene* const scene, unsigned int elapsedMS);
+
+		float FieldOfView;
+		float NearClipDistance;
+		float FarClipDistance;
+
+	protected:
+		CameraNode();
+	};
 }
 
 #endif // __CAMERA_H__

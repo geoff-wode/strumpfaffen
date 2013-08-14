@@ -39,7 +39,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(ProjectDir)include;$(SolutionDir)Framework\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir);$(ProjectDir)include;$(SolutionDir)Framework\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)lib\$(Configuration);$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)intermediate\$(ProjectName)\$(Configuration)\</IntDir>
@@ -160,12 +160,42 @@ echo Build post-step for $(ProjectName) complete.
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\framework\device.cpp" />
+    <ClCompile Include="src\framework\files.cpp" />
+    <ClCompile Include="src\framework\movementcontroller.cpp" />
+    <ClCompile Include="src\framework\scenegraph\cameranode.cpp" />
+    <ClCompile Include="src\framework\scenegraph\meshnode.cpp" />
+    <ClCompile Include="src\framework\scenegraph\scene.cpp" />
+    <ClCompile Include="src\framework\scenegraph\scenenode.cpp" />
+    <ClCompile Include="src\framework\scenegraph\shadernode.cpp" />
+    <ClCompile Include="src\framework\scenegraph\transformnode.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\framework\shaders\shader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\common.glsl" />
-    <None Include="shaders\simplest\fs.glsl" />
-    <None Include="shaders\simplest\vs.glsl" />
+    <None Include="shaders\simple\fs.glsl" />
+    <None Include="shaders\simple\vs.glsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\framework\buffers\buffers.h" />
+    <ClInclude Include="include\framework\clearstate.h" />
+    <ClInclude Include="include\framework\debug.h" />
+    <ClInclude Include="include\framework\device.h" />
+    <ClInclude Include="include\framework\drawstate.h" />
+    <ClInclude Include="include\framework\files.h" />
+    <ClInclude Include="include\framework\input\keyboard.h" />
+    <ClInclude Include="include\framework\input\mouse.h" />
+    <ClInclude Include="include\framework\input\movementcontroller.h" />
+    <ClInclude Include="include\framework\scenegraph\cameranode.h" />
+    <ClInclude Include="include\framework\scenegraph\matrixstack.h" />
+    <ClInclude Include="include\framework\scenegraph\meshnode.h" />
+    <ClInclude Include="include\framework\scenegraph\scene.h" />
+    <ClInclude Include="include\framework\scenegraph\scenenode.h" />
+    <ClInclude Include="include\framework\scenegraph\shadernode.h" />
+    <ClInclude Include="include\framework\scenegraph\transformnode.h" />
+    <ClInclude Include="include\framework\shaders\shader.h" />
+    <ClInclude Include="include\framework\shaders\uniform.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -7,11 +7,12 @@
 namespace SceneGraph
 {
 
-	class TransformNodeClass : public SceneNodeClass
+	class TransformNode : public SceneNode
 	{
 	public:
-		TransformNodeClass();
-		virtual ~TransformNodeClass();
+		static boost::shared_ptr<TransformNode> Create();
+
+		virtual ~TransformNode();
 
 		virtual bool PreRender(Scene* const scene);
 		virtual void PostRender(Scene* const scene);
@@ -23,9 +24,10 @@ namespace SceneGraph
 
 		// Transform from world- to object-space.
 		glm::mat4 FromWorld;
-	};
 
-	typedef boost::shared_ptr<TransformNodeClass> TransformNode;
+	protected:
+		TransformNode();
+	};
 }
 
 #endif // __TRANSFORM_NODE_H__
