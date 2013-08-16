@@ -4,8 +4,6 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-#if defined(ENABLE_DEBUG)
-
 #define LOG(msg, ...) fprintf(stderr, msg, __VA_ARGS__)
 
 #define ASSERT(pred) ASSERTM(pred, "")
@@ -27,7 +25,5 @@
 #define ASSERT(pred)	do { } while (0)
 
 #define ASSERTM(pred, msg, ...) do { } while (0)
-
-#endif // ENABLE_DEBUG
 
 #endif // __DEBUG_H__

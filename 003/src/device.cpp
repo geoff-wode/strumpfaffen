@@ -68,16 +68,25 @@ void Device::Clear(const ClearState& state)
 
 void Device::Draw(GLenum primitiveType, size_t primitiveCount, const RenderState& state)
 {
-	state.shader->Use();
+	ApplyRenderState(state);
+	switch (primitiveType)
+	{
+	case GL_TRIANGLES: glDrawArrays(primitiveType, 0, primitiveCount * 3); break;
+	case GL_TRIANGLE_STRIP: glDrawArrays(primitiveType, 0, primitiveCount + 2); break;
+	default: break;
+	}
+}
 
-	state.vertexBuffer->Bind();
-	ApplyVertexDecl(state.vertexDecl);
-	
-	glDrawArrays(primitiveType, 0, primitiveCount * 3);
+void Device::DrawIndexed(GLenum primitiveType, size_t primitiveCount, GLenum indexType, const RenderState& state)
+{
+	ApplyRenderState(state);
 
-	state.vertexBuffer->Unbind();
-
-	glUseProgram(0);
+	switch (primitiveType)
+	{
+	case GL_TRIANGLES: glDrawElements(primitiveType, primitiveCount * 3, indexType, 0); break;
+	case GL_TRIANGLE_STRIP: glDrawElements(primitiveType, primitiveCount + 2, indexType, 0); break;
+	default: break;
+	}
 }
 
 //---------------------------------------------------------------------------------------
@@ -132,42 +141,105 @@ void Device::ApplyClearState(const ClearState& newState)
 		glClearDepth(clearState.depth);
 	}
 
-	if (renderState.colourMask != newState.colourMask)
-	{
-		renderState.colourMask = newState.colourMask;
-		glColorMask(renderState.colourMask.r, renderState.colourMask.g, renderState.colourMask.b, renderState.colourMask.a);
-	}
-
-	if (renderState.depthMask != newState.depthMask)
-	{
-		renderState.depthMask = newState.depthMask;
-		glDepthMask(renderState.depthMask);
-	}
+	ApplyColourMask(newState.colourMask);
+	ApplyDepthMask(newState.depthMask);
 }
 
 //---------------------------------------------------------------------------------------
 
-void Device::ApplyVertexDecl(const VertexDeclaration* const decl)
+void Device::ApplyRenderState(const RenderState& state)
 {
-	if (renderState.vertexDecl != decl)
-	{
-		const size_t stride = decl->Stride;
-		const VertexAttributeList& attrs = decl->Attributes;
+	ApplyColourMask(state.colourMask);
+	ApplyDepthMask(state.depthMask);
+	ApplyShaderProgram(state.shader);
+	ApplyVertexBuffer(state.vertexArray->vertexBuffer);
+	ApplyIndexBuffer(state.vertexArray->indexBuffer);
+	ApplyVertexArray(state.vertexArray->vertexDecl);
+}
 
-		GLuint index = 0;
-		for (VertexAttributeList::const_iterator i = decl->Attributes.cbegin(); i != decl->Attributes.cend(); ++i)
+void Device::ApplyColourMask(const glm::bvec4& mask)
+{
+	if (mask != mask)
+	{
+		renderState.colourMask = mask;
+		glColorMask(mask.r, mask.g, mask.b, mask.a);
+	}
+}
+
+void Device::ApplyDepthMask(bool mask)
+{
+	if (renderState.depthMask != mask)
+	{
+		renderState.depthMask = mask;
+		glDepthMask(mask);
+	}
+}
+
+void Device::ApplyShaderProgram(boost::shared_ptr<ShaderProgram> shader)
+{
+	if (activeShader != shader)
+	{
+		activeShader = shader;
+		activeShader->Bind();
+	}
+	activeShader->Apply();
+}
+
+void Device::ApplyVertexBuffer(boost::shared_ptr<Buffer> buffer)
+{
+	if (activeVertexBuffer != buffer)
+	{
+		if (activeVertexBuffer) { activeVertexBuffer->Unbind(); }
+		activeVertexBuffer = buffer;
+		activeVertexBuffer->Bind();
+	}
+}
+
+void Device::ApplyIndexBuffer(boost::shared_ptr<Buffer> buffer)
+{
+	// If the buffers are different...
+	if (activeIndexBuffer != buffer)
+	{
+		if (buffer) // ...then if a new buffer is being applied, bind to it...
 		{
-			glEnableVertexAttribArray(index);
+			activeIndexBuffer = buffer;
+			activeIndexBuffer->Bind();
+		}
+		else // ...there is no buffer, unbind the current one...
+		{
+			activeIndexBuffer->Unbind();
+			activeIndexBuffer = buffer;
+		}
+	}
+}
+
+
+// Herein we match up the name of the vertex declaration attribute with the shader attribute
+// in order to determine its shader "location". Note that these locations may be different from
+// shader to shader.
+void Device::ApplyVertexArray(const VertexDeclaration* const decl)
+{
+	// Enable each attibute of the vertex declaration...
+	const size_t stride = decl->Stride;
+	const VertexAttributeList& attrs = decl->Attributes;
+
+	for (VertexAttributeList::const_iterator i = decl->Attributes.cbegin(); i != decl->Attributes.cend(); ++i)
+	{
+		const ShaderAttributeMap::const_iterator attr = activeShader->GetAttributes()->find(i->name);
+		if (attr != activeShader->GetAttributes()->cend())
+		{
+			// ...taking care to use the attribute location defined in the shader...
+			const GLuint location = attr->second.location;
+
+			glEnableVertexAttribArray(location);
 			switch (i->type)
 			{
-			case GL_FLOAT: glVertexAttribPointer(index, 1, GL_FLOAT, GL_FALSE, stride, (const void*)i->offset); break;
-			case GL_FLOAT_VEC2: glVertexAttribPointer(index, 2, GL_FLOAT, GL_FALSE, stride, (const void*)i->offset); break;
-			case GL_FLOAT_VEC3: glVertexAttribPointer(index, 3, GL_FLOAT, GL_FALSE, stride, (const void*)i->offset); break;
-			case GL_FLOAT_VEC4: glVertexAttribPointer(index, 4, GL_FLOAT, GL_FALSE, stride, (const void*)i->offset); break;
+			case GL_FLOAT: glVertexAttribPointer(location, 1, GL_FLOAT, GL_FALSE, stride, (const void*)i->offset); break;
+			case GL_FLOAT_VEC2: glVertexAttribPointer(location, 2, GL_FLOAT, GL_FALSE, stride, (const void*)i->offset); break;
+			case GL_FLOAT_VEC3: glVertexAttribPointer(location, 3, GL_FLOAT, GL_FALSE, stride, (const void*)i->offset); break;
+			case GL_FLOAT_VEC4: glVertexAttribPointer(location, 4, GL_FLOAT, GL_FALSE, stride, (const void*)i->offset); break;
 			default: break;
 			}
 		}
-
-		renderState.vertexDecl = decl;
 	}
 }

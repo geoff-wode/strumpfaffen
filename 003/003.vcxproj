@@ -62,7 +62,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>gl_loader.lib;Framework.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>gl_loader.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>msvcrt.lib</IgnoreSpecificDefaultLibraries>
     </Link>
     <PostBuildEvent>
@@ -163,6 +163,7 @@ echo Build post-step for $(ProjectName) complete.
     <ClCompile Include="src\buffer.cpp" />
     <ClCompile Include="src\device.cpp" />
     <ClCompile Include="src\files.cpp" />
+    <ClCompile Include="src\geometry\mesh.cpp" />
     <ClCompile Include="src\keyboard.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\program.cpp" />
@@ -177,6 +178,8 @@ echo Build post-step for $(ProjectName) complete.
     <ClInclude Include="include\device.h" />
     <ClInclude Include="include\drawstate.h" />
     <ClInclude Include="include\files.h" />
+    <ClInclude Include="include\geometry\mesh.h" />
+    <ClInclude Include="include\geometry\vertexarray.h" />
     <ClInclude Include="include\keyboard.h" />
     <ClInclude Include="include\program.h" />
     <ClInclude Include="include\renderstate.h" />
@@ -189,6 +192,11 @@ echo Build post-step for $(ProjectName) complete.
   <ItemGroup>
     <None Include="shaders\basic\fs.glsl" />
     <None Include="shaders\basic\vs.glsl" />
+    <None Include="shaders\common.glsl" />
+    <None Include="shaders\coloured\fs.glsl" />
+    <None Include="shaders\coloured\vs.glsl" />
+    <None Include="shaders\turning\fs.glsl" />
+    <None Include="shaders\turning\vs.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

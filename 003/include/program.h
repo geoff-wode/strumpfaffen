@@ -5,6 +5,7 @@
 #include <buffer.h>
 #include <shaders/shaderprogram.h>
 #include <boost/shared_ptr.hpp>
+#include <geometry/vertexarray.h>
 
 class Program
 {
@@ -24,8 +25,20 @@ protected:
 private:
 	bool quit;
 	boost::shared_ptr<Device> device;
-	boost::shared_ptr<Buffer> vertexBuffer;
-	boost::shared_ptr<ShaderProgram> shader;
+
+	boost::shared_ptr<VertexArray> vertexArray;
+	
+	float angle;
+	struct ColouredShader
+	{
+		boost::shared_ptr<ShaderProgram> shader;
+	} colourShader;
+
+	struct TurningShader
+	{
+		boost::shared_ptr<ShaderProgram> shader;
+		boost::shared_ptr<ShaderUniform> angle;
+	} turningShader;
 
 	ClearState clearState;
 	RenderState renderState;

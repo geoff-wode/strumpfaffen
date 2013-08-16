@@ -1,5 +1,6 @@
 #include <shaders/shaderuniform.h>
 #include <memory>
+#include <glm/ext.hpp>
 
 ShaderUniform::ShaderUniform(GLenum type, GLuint location)
 	: type(type), location(location), modified(false)
@@ -7,12 +8,12 @@ ShaderUniform::ShaderUniform(GLenum type, GLuint location)
 }
 
 void ShaderUniform::Set(float value) { CacheValue(this, &value, sizeof(value)); }
-void ShaderUniform::Set(const glm::vec2& value) { CacheValue(this, &value, sizeof(value)); }
-void ShaderUniform::Set(const glm::vec3& value) { CacheValue(this, &value, sizeof(value)); }
-void ShaderUniform::Set(const glm::vec4& value) { CacheValue(this, &value, sizeof(value)); }
-void ShaderUniform::Set(const glm::mat2& value) { CacheValue(this, &value, sizeof(value)); }
-void ShaderUniform::Set(const glm::mat3& value) { CacheValue(this, &value, sizeof(value)); }
-void ShaderUniform::Set(const glm::mat4& value) { CacheValue(this, &value, sizeof(value)); }
+void ShaderUniform::Set(const glm::vec2& value) { CacheValue(this, glm::value_ptr(value), sizeof(value)); }
+void ShaderUniform::Set(const glm::vec3& value) { CacheValue(this, glm::value_ptr(value), sizeof(value)); }
+void ShaderUniform::Set(const glm::vec4& value) { CacheValue(this, glm::value_ptr(value), sizeof(value)); }
+void ShaderUniform::Set(const glm::mat2& value) { CacheValue(this, glm::value_ptr(value), sizeof(value)); }
+void ShaderUniform::Set(const glm::mat3& value) { CacheValue(this, glm::value_ptr(value), sizeof(value)); }
+void ShaderUniform::Set(const glm::mat4& value) { CacheValue(this, glm::value_ptr(value), sizeof(value)); }
 
 float ShaderUniform::GetFloat() const { return *(float*)cache; }
 glm::vec2 ShaderUniform::GetVec2() const { return *(glm::vec2*)cache; }

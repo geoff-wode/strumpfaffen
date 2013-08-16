@@ -8,11 +8,12 @@
 //----------------------------------------------------------------------------------
 
 static GLuint CompileShader(GLenum type, const char* const src, size_t srcLen);
-void QueryShaderAttributes(GLuint program, ShaderAttributeMap& attributes);
+static void QueryShaderAttributes(GLuint program, ShaderAttributeMap& attributes);
+static void QueryShaderUniforms(GLuint program, ShaderUniformMap& uniforms);
 
 //----------------------------------------------------------------------------------
 
-static const char* const CommonShaderSrc =
+static const char CommonShaderSrc[] =
 {
 	"#version 330\n"
 	"layout (std140) uniform CommonShaderVarsBlock\n"
@@ -20,7 +21,7 @@ static const char* const CommonShaderSrc =
 	"	mat4 ViewMatrix;\n"
 	"	mat4 ProjectionMatrix;\n"
 	"	mat4 ViewProjectionMatrix;\n"
-	"	vec4sCameraPos;\n"
+	"	vec4 CameraPos;\n"
 	"};\n"
 	"\n"
 	"layout(location = 0) in vec3 VertexPosition;\n"				// Used for single-precision floats
@@ -28,6 +29,11 @@ static const char* const CommonShaderSrc =
 	"layout(location = 1) in vec3 VertexPositionLow;\n"
 	"layout(location = 2) in vec3 VertexNormal;\n"
 	"layout(location = 3) in vec2 VertexTexCoord0;\n"
+	"layout(location = 4) in vec3 VertexColour;\n"
+	"\n"
+	"#define PI 3.14159\n"
+	"#define TWO_PI (PI * 2)\n"
+	"#define PI_OVER_2 (PI * 0.5f)\n"
 };
 
 //----------------------------------------------------------------------------------
@@ -45,9 +51,9 @@ ShaderProgram::ShaderProgram(const std::string& name)
 		std::vector<char> src;
 		File::Load(*i, src);
 
-		if (*i == "vs.glsl") { shaders.push_back(CompileShader(GL_VERTEX_SHADER, src.data(), src.size())); }
-		if (*i == "gs.glsl") { shaders.push_back(CompileShader(GL_GEOMETRY_SHADER, src.data(), src.size())); }
-		if (*i == "fs.glsl") { shaders.push_back(CompileShader(GL_FRAGMENT_SHADER, src.data(), src.size())); }
+		if (i->npos != i->find("vs.glsl")) { shaders.push_back(CompileShader(GL_VERTEX_SHADER, src.data(), src.size())); }
+		if (i->npos != i->find("gs.glsl")) { shaders.push_back(CompileShader(GL_GEOMETRY_SHADER, src.data(), src.size())); }
+		if (i->npos != i->find("fs.glsl")) { shaders.push_back(CompileShader(GL_FRAGMENT_SHADER, src.data(), src.size())); }
 	}
 
 	for (size_t i = 0; i < shaders.size(); ++i) { glAttachShader(program, shaders[i]); }
@@ -65,6 +71,7 @@ ShaderProgram::ShaderProgram(const std::string& name)
 	if (linkedOK)
 	{
 		QueryShaderAttributes(program, attributes);
+		QueryShaderUniforms(program, uniforms);
 	}
 	else
 	{
@@ -73,6 +80,7 @@ ShaderProgram::ShaderProgram(const std::string& name)
 		std::vector<GLchar> log(logLength+1);
 		glGetProgramInfoLog(program, logLength, NULL, log.data());
 		LOG("%s\n", log.data());
+		exit(0);
 	}
 }
 
@@ -88,16 +96,19 @@ const ShaderAttributeMap* const ShaderProgram::GetAttributes() const
 	return &attributes;
 }
 
-const ShaderUniformMap* const ShaderProgram::GetUniforms() const
+const ShaderUniformMap& ShaderProgram::GetUniforms() const
 {
-	return &uniforms;
+	return uniforms;
 }
 
 //----------------------------------------------------------------------------------
-void ShaderProgram::Use()
+void ShaderProgram::Bind()
 {
 	glUseProgram(program);
+}
 
+void ShaderProgram::Apply()
+{
 	for (ShaderUniformMap::iterator i = uniforms.begin(); i != uniforms.end(); ++i)
 	{
 		i->second->Apply();
@@ -131,7 +142,7 @@ static GLuint CompileShader(GLenum type, const char* const src, size_t srcLen)
 
 //----------------------------------------------------------------------------------
 
-void QueryShaderAttributes(GLuint program, ShaderAttributeMap& attributes)
+static void QueryShaderAttributes(GLuint program, ShaderAttributeMap& attributes)
 {
 	GLint numAttrs;
 	glGetProgramiv(program, GL_ACTIVE_ATTRIBUTES, &numAttrs);
@@ -149,7 +160,7 @@ void QueryShaderAttributes(GLuint program, ShaderAttributeMap& attributes)
 }
 
 //----------------------------------------------------------------------------------
-void QueryShaderUniforms(GLuint program, ShaderUniformMap& uniforms)
+static void QueryShaderUniforms(GLuint program, ShaderUniformMap& uniforms)
 {
 	GLint numUniforms;
 	glGetProgramiv(program, GL_ACTIVE_UNIFORMS, &numUniforms);

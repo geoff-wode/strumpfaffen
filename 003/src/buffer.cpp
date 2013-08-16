@@ -24,16 +24,12 @@ GLuint Buffer::GetHandle() const
 
 void Buffer::SetData(const void* const data, size_t size, size_t offset)
 {
-	Bind();
 	glBufferSubData(type, offset, size, data);
-	Unbind();
 }
 
 void Buffer::GetData(void* const data, size_t size, size_t offset)
 {
-	Bind();
 	glGetBufferSubData(type, offset, size, data);
-	Unbind();
 }
 
 void Buffer::Bind()

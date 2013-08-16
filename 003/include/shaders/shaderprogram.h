@@ -1,3 +1,5 @@
+// Ah, shaders! The life-blood of a modern graphics program...
+
 #if ! defined(__SHADER_PROGRAM__)
 #define __SHADER_PROGRAM__
 
@@ -13,10 +15,11 @@ public:
 	ShaderProgram(const std::string& name);
 	~ShaderProgram();
 
-	void Use();
+	void Bind();
+	void Apply();
 
 	const ShaderAttributeMap* const GetAttributes() const;
-	const ShaderUniformMap* const GetUniforms() const;
+	const ShaderUniformMap& GetUniforms() const;
 
 private:
 	GLuint program;

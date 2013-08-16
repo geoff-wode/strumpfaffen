@@ -4,7 +4,7 @@
 #include <glm/glm.hpp>
 #include <boost/shared_ptr.hpp>
 #include <buffer.h>
-#include <geometry/vertexdeclaration.h>
+#include <geometry/vertexarray.h>
 #include <shaders/shaderprogram.h>
 
 struct RenderState
@@ -18,10 +18,9 @@ struct RenderState
 	glm::bvec4 colourMask;
 	bool depthMask;
 
-	ShaderProgram* shader;
-	const VertexDeclaration* vertexDecl;
+	boost::shared_ptr<ShaderProgram> shader;
 
-	boost::shared_ptr<Buffer> vertexBuffer;
+	boost::shared_ptr<VertexArray> vertexArray;
 };
 
 #endif // __RENDER_STATE__
