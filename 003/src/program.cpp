@@ -67,7 +67,8 @@ void Program::Run()
 		Update(elapsedMS);
 
 		Render();
-		SDL_GL_SwapBuffers();
+
+		device->SwapBuffers();
 	}
 }
 
@@ -118,7 +119,7 @@ void Program::LoadResources()
 //----------------------------------------------------------------------------------
 void Program::Update(unsigned int elapsedMS)
 {
-	if (Keyboard::IsKeyDown(SDLK_ESCAPE)) { Quit(); }
+	if (Keyboard::IsKeyDown(SDL_SCANCODE_ESCAPE)) { Quit(); }
 
 	const float turnRate = 3.14159f / 1000.0f;
 	angle += turnRate * (float)elapsedMS;

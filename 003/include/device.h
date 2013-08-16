@@ -1,6 +1,7 @@
 #if ! defined(__DEVICE__)
 #define __DEVICE__
 
+#include <SDL.h>
 #include <glm/glm.hpp>
 #include <viewport.h>
 #include <clearstate.h>
@@ -22,7 +23,10 @@ public:
 	void Draw(GLenum primitiveType, size_t primitiveCount, const RenderState& state);
 	void DrawIndexed(GLenum primitiveType, size_t indexCount, GLenum indexType, const RenderState& state);
 
+	void SwapBuffers() const;
+
 private:
+	SDL_Window* mainWindow;
 	Viewport viewport;
 	ClearState clearState;
 	RenderState renderState;

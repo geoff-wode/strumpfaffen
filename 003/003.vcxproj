@@ -68,9 +68,9 @@
     <PostBuildEvent>
       <Command>@echo off
 
-if exist $(SDL_DIR)lib\x86\SDL.dll (
-  echo Copying SDL runtime...
-  xcopy $(SDL_DIR)lib\x86\SDL.dll $(OutDir) /r/y
+if exist $(SDL2_DIR)lib\x86\SDL2.dll (
+  echo Copying SDL2 runtime...
+  xcopy $(SDL2_DIR)lib\x86\SDL2.dll $(OutDir) /r/y
   if errorlevel 1 goto OnFault
 )
 
@@ -167,8 +167,8 @@ echo Build post-step for $(ProjectName) complete.
     <ClCompile Include="src\keyboard.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\program.cpp" />
-    <ClCompile Include="src\shaderprogram.cpp" />
-    <ClCompile Include="src\shaderuniform.cpp" />
+    <ClCompile Include="src\shaders\shaderprogram.cpp" />
+    <ClCompile Include="src\shaders\shaderuniform.cpp" />
     <ClCompile Include="src\viewport.cpp" />
   </ItemGroup>
   <ItemGroup>

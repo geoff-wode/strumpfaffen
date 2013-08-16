@@ -2,15 +2,18 @@
 #define __KEYBOARD__
 
 #include <SDL.h>
-#include <vector>
+#include <list>
 
 class Keyboard
 {
 public:
-	static bool IsKeyDown(SDLKey key);
-	static bool IsKeyUp(SDLKey key);
+	static bool IsKeyDown(SDL_Scancode key);
+	static bool IsKeyUp(SDL_Scancode key);
 
-	static void GetPressedKeys(std::vector<SDLKey>& keys);
+	static void GetPressedKeys(std::list<SDL_Scancode>& keys);
+
+private:
+	static std::list<SDL_Scancode> pressedKeys;
 };
 
 #endif //__KEYBOARD__

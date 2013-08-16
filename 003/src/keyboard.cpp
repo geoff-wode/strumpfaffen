@@ -1,20 +1,23 @@
 #include <keyboard.h>
 
-bool Keyboard::IsKeyDown(SDLKey key)
+std::list<SDL_Scancode> Keyboard::pressedKeys(SDL_NUM_SCANCODES);
+
+bool Keyboard::IsKeyDown(SDL_Scancode key)
 {
-	return (0 != SDL_GetKeyState(NULL)[key]);
+	return (0 != SDL_GetKeyboardState(NULL)[key]);
 }
 
-bool Keyboard::IsKeyUp(SDLKey key)
+bool Keyboard::IsKeyUp(SDL_Scancode key)
 {
-	return (0 == SDL_GetKeyState(NULL)[key]);
+	return (0 == SDL_GetKeyboardState(NULL)[key]);
 }
 
-void Keyboard::GetPressedKeys(std::vector<SDLKey>& keys)
+void Keyboard::GetPressedKeys(std::list<SDL_Scancode>& keys)
 {
-	Uint8* keyState = SDL_GetKeyState(NULL);
-	for (int k = SDLK_FIRST; k != SDLK_LAST; ++k)
+	keys.clear();
+	const Uint8* keyState = SDL_GetKeyboardState(NULL);
+	for (int c = 0; c < SDL_NUM_SCANCODES; ++c)
 	{
-		if (keyState[k]) { keys.push_back((SDLKey)k); }
+		if (keyState[c]) { keys.push_back((SDL_Scancode)c); }
 	}
 }

@@ -24,14 +24,25 @@ Device::~Device()
 bool Device::Initialise()
 {
 	InitialiseSDL();
-	if (NULL == SDL_SetVideoMode(backbufferSize.x, backbufferSize.y, 32, SDL_OPENGL | SDL_HWSURFACE))
+
+	mainWindow = SDL_CreateWindow(
+		"Strumpfaffen",
+		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+		backbufferSize.x, backbufferSize.y,
+		SDL_WINDOW_OPENGL);
+
+	if (NULL == mainWindow)
 	{
 		return false;
 	}
 	InitialiseSDL();
 
-	viewport.size.x = SDL_GetVideoSurface()->w;
-	viewport.size.y = SDL_GetVideoSurface()->h;
+	if (NULL == SDL_GL_CreateContext(mainWindow))
+	{
+		return false;
+	}
+
+	SDL_GetWindowSize(mainWindow, &viewport.size.x, &viewport.size.y);
 
 	ogl_LoadFunctions();
 
@@ -90,23 +101,31 @@ void Device::DrawIndexed(GLenum primitiveType, size_t primitiveCount, GLenum ind
 }
 
 //---------------------------------------------------------------------------------------
+
+void Device::SwapBuffers() const
+{
+	SDL_GL_SwapWindow(mainWindow);
+}
+
+//---------------------------------------------------------------------------------------
 static void InitialiseSDL()
 {
 	const struct SDLAttribute
 	{
-		const char* name;
 		SDL_GLattr  attr;
 		int         value;
 	} sdlAttributes[] =
 	{
-		{ "SDL_GL_DOUBLEBUFFER",  SDL_GL_DOUBLEBUFFER,            1 },
-		{ "SDL_GL_RED_SIZE",      SDL_GL_RED_SIZE,                8 },
-		{ "SDL_GL_GREEN_SIZE",    SDL_GL_GREEN_SIZE,              8 },
-		{ "SDL_GL_BLUE_SIZE",     SDL_GL_BLUE_SIZE,               8 },
-		{ "SDL_GL_ALPHA_SIZE",    SDL_GL_ALPHA_SIZE,              8 },
-		{ "SDL_GL_BUFFER_SIZE",   SDL_GL_BUFFER_SIZE,             24 },
-		{ "SDL_GL_MULTISAMPLEBUFFERS", SDL_GL_MULTISAMPLEBUFFERS, 1 },
-		{ "SDL_GL_MULTISAMPLESAMPLES", SDL_GL_MULTISAMPLESAMPLES, 4 }
+		{ SDL_GL_DOUBLEBUFFER,				1 },
+		{ SDL_GL_RED_SIZE,						8 },
+		{ SDL_GL_GREEN_SIZE,					8 },
+		{ SDL_GL_BLUE_SIZE,						8 },
+		{ SDL_GL_ALPHA_SIZE,					8 },
+		{ SDL_GL_BUFFER_SIZE,					24 },
+		{ SDL_GL_DEPTH_SIZE,					24 },
+		{ SDL_GL_STENCIL_SIZE,				8 },
+		{ SDL_GL_MULTISAMPLEBUFFERS,	1 },
+		{ SDL_GL_MULTISAMPLESAMPLES,	4 }
 	};
 	const int NumAttributes = sizeof(sdlAttributes)/sizeof(sdlAttributes[0]);
 
