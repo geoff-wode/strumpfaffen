@@ -13,7 +13,7 @@
 struct Vertex
 {
 	glm::vec3 position;
-	glm::vec4 colour;
+	glm::vec2 textureCoord;
 };
 
 //----------------------------------------------------------------------------------
@@ -28,7 +28,7 @@ static void RenderFrame();
 FILE* debugLogFile;
 static bool quit = false;
 static KeyboardState oldKeyState;
-static RenderState triangleRenderState;
+static RenderState renderState;
 
 //----------------------------------------------------------------------------------
 
@@ -74,15 +74,18 @@ static bool Initialise()
 	static const VertexAttribute attrs[] =
 	{
 		VertexAttribute("Position", GL_FLOAT, 3, offsetof(Vertex, position)),
-		VertexAttribute("Colour", GL_FLOAT, 3, offsetof(Vertex, colour))
+		VertexAttribute("TexCoord0", GL_FLOAT, 2, offsetof(Vertex, textureCoord))
 	};
 
 	static const Vertex vertices[] =
 	{
-		{ glm::vec3(-0.75f, -0.75f, 0.0f), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f) },
-		{ glm::vec3( 0.75f, -0.75f, 0.0f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f) },
-		{ glm::vec3( 0.00f,  0.75f, 0.0f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f) }
+		{ glm::vec3(-0.75f,  0.75f, 0.0f), glm::vec2(0.0f, 1.0f) },
+		{ glm::vec3(-0.75f, -0.75f, 0.0f), glm::vec2(0.0f, 0.0f) },
+		{ glm::vec3( 0.75f, -0.75f, 0.0f), glm::vec2(1.0f, 0.0f) },
+		{ glm::vec3( 0.75f,  0.75f, 0.0f), glm::vec2(1.0f, 1.0f) }
 	};
+
+	static const unsigned short indices[] = { 0, 1, 2, 2, 3, 0 };
 
 	// Create a vertex array of 1 buffer of 3 vertices of 2 attributes...
 	boost::shared_ptr<VertexBuffer> vb = CreateVertexBuffer(sizeof(vertices), GL_STATIC_DRAW);
@@ -91,10 +94,15 @@ static bool Initialise()
 	VertexBuffer::Disable();
 
 	VertexDeclarationPtr decl(new VertexDeclaration(sizeof(Vertex), vb, attrs, 2));
-	triangleRenderState.vertexArray = boost::make_shared<VertexArray>(&decl, 1);
+	renderState.vertexArray = boost::make_shared<VertexArray>(&decl, 1);
 
-	triangleRenderState.shader = boost::make_shared<Shader>("shaders/passthru");
-	if (!triangleRenderState.shader->Build()) { return false; }
+	renderState.indexBuffer = CreateIndexBuffer(sizeof(indices), GL_UNSIGNED_SHORT, GL_STATIC_DRAW);
+	renderState.indexBuffer->Enable();
+	renderState.indexBuffer->SetData(indices, sizeof(indices), 0);
+	renderState.indexBuffer->Disable();
+
+	renderState.shader = boost::make_shared<Shader>("shaders/bricks");
+	if (!renderState.shader->Build()) { return false; }
 
 	oldKeyState = Keyboard::GetState();
 
@@ -121,7 +129,7 @@ static void RenderFrame()
 	static ClearState clearState;
 	Device::Clear(clearState, GL_COLOR_BUFFER_BIT);
 
-	Device::Draw(GL_TRIANGLES, 1, 0, triangleRenderState);
+	Device::Draw(GL_TRIANGLES, 2, 0, renderState);
 }
 
 //----------------------------------------------------------------------------------

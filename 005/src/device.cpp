@@ -159,6 +159,7 @@ void Device::Draw(GLenum primitiveType, size_t primitiveCount, size_t startVerte
 
 	if (glState.renderState.indexBuffer)
 	{
+		glDrawElements(primitiveType, vertexCount, glState.renderState.indexBuffer->Type, (const void*)startVertex);
 	}
 	else
 	{

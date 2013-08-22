@@ -31,9 +31,9 @@ void Buffer::Enable()
 
 //----------------------------------------------------------------------------------
 
-boost::shared_ptr<IndexBuffer> CreateIndexBuffer(size_t size, GLenum usage)
+boost::shared_ptr<IndexBuffer> CreateIndexBuffer(size_t size, GLenum type, GLenum usage)
 {
-	return boost::make_shared<IndexBuffer>(size, usage);
+	return boost::make_shared<IndexBuffer>(size, type, usage);
 }
 
 boost::shared_ptr<VertexBuffer> CreateVertexBuffer(size_t size, GLenum usage)

@@ -27,8 +27,12 @@ private:
 class IndexBuffer : public Buffer
 {
 public:
-	IndexBuffer(size_t size, GLenum usage) : Buffer(GL_ELEMENT_ARRAY_BUFFER, size, usage)
+	IndexBuffer(size_t size, GLenum type, GLenum usage)
+		: Buffer(GL_ELEMENT_ARRAY_BUFFER, size, usage),
+			Type(type)
 	{	}
+
+	const GLenum Type;
 
 	static void Disable() { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); }
 };
@@ -53,7 +57,7 @@ public:
 
 //----------------------------------------------------------------------------------
 
-boost::shared_ptr<IndexBuffer> CreateIndexBuffer(size_t size, GLenum usage);
+boost::shared_ptr<IndexBuffer> CreateIndexBuffer(size_t size, GLenum type, GLenum usage);
 boost::shared_ptr<VertexBuffer> CreateVertexBuffer(size_t size, GLenum usage);
 boost::shared_ptr<UniformBuffer> CreateUniformBuffer(size_t size, GLenum usage);
 

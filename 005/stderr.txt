@@ -1,3 +1,7 @@
-08/22/13 16:30:37
+08/23/13 00:44:04
 OpenGL v4.2
 GLSL v4.20
+vertex array: Position - 3 x GL_FLOAT @ 0
+vertex array: TexCoord0 - 2 x GL_FLOAT @ 4
+shader attrib 0: Position - 1 x GL_FLOAT_VEC3 @ 0
+shader attrib 1: TexCoord0 - 1 x GL_FLOAT_VEC2 @ 4
