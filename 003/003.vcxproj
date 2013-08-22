@@ -46,7 +46,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(ProjectDir)include;$(SolutionDir)Framework\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)include;$(SolutionDir);$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)lib\$(Configuration);$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)intermediate\$(ProjectName)\$(Configuration)\</IntDir>
@@ -68,9 +68,15 @@
     <PostBuildEvent>
       <Command>@echo off
 
-if exist $(SDL2_DIR)lib\x86\SDL2.dll (
+if exist $(SDL2_DIR)lib\$(PlatformShortName)\SDL2.dll (
   echo Copying SDL2 runtime...
-  xcopy $(SDL2_DIR)lib\x86\SDL2.dll $(OutDir) /r/y
+  xcopy $(SDL2_DIR)lib\$(PlatformShortName)\SDL2.dll $(OutDir) /r/y
+  if errorlevel 1 goto OnFault
+)
+
+if exist $(FREEIMAGE_DIR)lib\$(PlatformShortName)\FreeImage.dll (
+  echo Copying SDL2 runtime...
+  xcopy $(FREEIMAGE_DIR)lib\$(PlatformShortName)\FreeImage.dll $(OutDir) /r/y
   if errorlevel 1 goto OnFault
 )
 
@@ -161,12 +167,25 @@ echo Build post-step for $(ProjectName) complete.
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\buffer.cpp" />
+    <ClCompile Include="src\core\device.cpp" />
+    <ClCompile Include="src\core\indexbuffer.cpp" />
+    <ClCompile Include="src\core\shader.cpp" />
+    <ClCompile Include="src\core\shaderuniform.cpp" />
+    <ClCompile Include="src\core\test.cpp" />
+    <ClCompile Include="src\core\uniformbuffer.cpp" />
+    <ClCompile Include="src\core\vertexbuffer.cpp" />
     <ClCompile Include="src\device.cpp" />
     <ClCompile Include="src\files.cpp" />
     <ClCompile Include="src\geometry\mesh.cpp" />
     <ClCompile Include="src\keyboard.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\program.cpp" />
+    <ClCompile Include="src\scenegraph\cameranode.cpp" />
+    <ClCompile Include="src\scenegraph\grid.cpp" />
+    <ClCompile Include="src\scenegraph\matrixstack.cpp" />
+    <ClCompile Include="src\scenegraph\scene.cpp" />
+    <ClCompile Include="src\scenegraph\scenenode.cpp" />
+    <ClCompile Include="src\scenegraph\transformnode.cpp" />
     <ClCompile Include="src\shaders\shaderprogram.cpp" />
     <ClCompile Include="src\shaders\shaderuniform.cpp" />
     <ClCompile Include="src\viewport.cpp" />
@@ -174,6 +193,16 @@ echo Build post-step for $(ProjectName) complete.
   <ItemGroup>
     <ClInclude Include="include\buffer.h" />
     <ClInclude Include="include\clearstate.h" />
+    <ClInclude Include="include\core\attributetype.h" />
+    <ClInclude Include="include\core\bufferusage.h" />
+    <ClInclude Include="include\core\clearstate.h" />
+    <ClInclude Include="include\core\device.h" />
+    <ClInclude Include="include\core\indexbuffer.h" />
+    <ClInclude Include="include\core\renderstate.h" />
+    <ClInclude Include="include\core\shaders\shader.h" />
+    <ClInclude Include="include\core\shaders\uniform.h" />
+    <ClInclude Include="include\core\uniformbuffer.h" />
+    <ClInclude Include="include\core\vertexbuffer.h" />
     <ClInclude Include="include\debug.h" />
     <ClInclude Include="include\device.h" />
     <ClInclude Include="include\drawstate.h" />
@@ -184,10 +213,17 @@ echo Build post-step for $(ProjectName) complete.
     <ClInclude Include="include\program.h" />
     <ClInclude Include="include\renderstate.h" />
     <ClInclude Include="include\geometry\vertexdeclaration.h" />
+    <ClInclude Include="include\scenegraph\cameranode.h" />
+    <ClInclude Include="include\scenegraph\grid.h" />
+    <ClInclude Include="include\scenegraph\matrixstack.h" />
+    <ClInclude Include="include\scenegraph\scene.h" />
+    <ClInclude Include="include\scenegraph\scenenode.h" />
+    <ClInclude Include="include\scenegraph\transformnode.h" />
     <ClInclude Include="include\shaders\shaderattribute.h" />
     <ClInclude Include="include\shaders\shaderprogram.h" />
     <ClInclude Include="include\shaders\shaderuniform.h" />
     <ClInclude Include="include\viewport.h" />
+    <ClInclude Include="src\core\shadercompilerdefines.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\basic\fs.glsl" />

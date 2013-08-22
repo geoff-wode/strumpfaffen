@@ -4,8 +4,45 @@
 
 //---------------------------------------------------------------------------------------
 
+Device::UniformBlockBufferMap Device::blocks;
+
+//---------------------------------------------------------------------------------------
+
 static void InitialiseSDL();
 static void ForceState(const ClearState& clearState, const RenderState& renderState);
+
+//---------------------------------------------------------------------------------------
+
+void Device::CreateBlockBuffer(const std::string& name, size_t size)
+{
+	boost::shared_ptr<Buffer> buffer(boost::make_shared<Buffer>(size, GL_UNIFORM_BUFFER, GL_DYNAMIC_DRAW));
+
+	buffer->Bind();
+	glBindBufferBase(GL_UNIFORM_BUFFER, blocks.size(), buffer->GetHandle());
+	buffer->Unbind();
+
+	blocks[name] = buffer;
+}
+
+GLuint Device::GetBlockBindingIndex(const std::string& name)
+{
+	GLuint index = 0;
+	for (UniformBlockBufferMap::const_iterator i = blocks.cbegin(); i != blocks.cend(); ++i)
+	{
+		if (i->first == name) { return index; }
+		++index;
+	}
+	return GL_INVALID_INDEX;
+}
+
+boost::shared_ptr<Buffer> Device::GetBlockBuffer(const std::string& name)
+{
+	for (UniformBlockBufferMap::const_iterator i = blocks.cbegin(); i != blocks.cend(); ++i)
+	{
+		if (i->first == name) { return i->second; }
+	}
+	return NULL;
+}
 
 //---------------------------------------------------------------------------------------
 

@@ -2,20 +2,23 @@
 #include <program.h>
 #include <keyboard.h>
 #include <boost/make_shared.hpp>
+#include <textures/texture2d.h>
 
 //----------------------------------------------------------------------------------
 
 struct VertexPosition
 {
 	glm::vec3 position;
-	glm::vec3 colour;
+	glm::vec3 normal;
+	glm::vec2 textureCoord;
 
 	static const VertexDeclaration* GetVertexDecl()
 	{
 		static const VertexAttribute attrs[] =
 		{
 			{ "VertexPosition", GL_FLOAT_VEC3, offsetof(VertexPosition, position) },
-			{ "VertexColour", GL_FLOAT_VEC3, offsetof(VertexPosition, colour) }
+			{ "VertexNormal", GL_FLOAT_VEC3, offsetof(VertexPosition, normal) },
+			{ "VertexTexCoord0", GL_FLOAT_VEC2, offsetof(VertexPosition, textureCoord) }
 		};
 		static const size_t attrCount = sizeof(attrs) / sizeof(attrs[0]);
 		static VertexDeclaration vertexDecl(sizeof(VertexPosition), attrs, attrCount);
@@ -26,16 +29,50 @@ struct VertexPosition
 
 //----------------------------------------------------------------------------------
 
-static const VertexPosition vertices[] =
+static void DefineVertices(int width, int height, std::vector<VertexPosition>& vertices)
 {
-	{ glm::vec3(-0.75f,-0.75f, 0.0f),	glm::vec3(1,0,0) },
-	{ glm::vec3( 0.75f,-0.75f, 0.0f), glm::vec3(0,1,0) },
-	{ glm::vec3( 0.0f, 0.75f, 0.0f),	glm::vec3(0,0,1) }
-};
-static const size_t vertexCount = sizeof(vertices) / sizeof(vertices[0]);
+	vertices.resize(width * height);
 
-static const unsigned short indices[] = { 0, 1, 2 };
-static const size_t indexCount = sizeof(indices) / sizeof(indices[0]);
+	int i = 0;
+	for (int z = 0; z < height; z++)
+	{
+		for (int x = 0; x < width; ++x)
+		{
+			vertices[i].position = glm::vec3(x, 0, -z);
+			vertices[i].normal = glm::vec3(0, 0, 1);
+			vertices[i].textureCoord = glm::vec2((float)x / (float)width, (float)z / (float)height);
+			++i;
+		}
+	}
+}
+
+static void DefineIndices(int width, int height, std::vector<unsigned short>& indices)
+{
+	indices.resize(2 * width * (height - 1));
+
+	int i = 0;
+	int z = 0;
+
+	while (z < height - 1)
+	{
+		for (int x = 0; x < width; ++x)
+		{
+			indices[i++] = x + (z * width);
+			indices[i++] = x + ((z + 1) * width);
+		}
+		++z;
+
+		if (z < height - 1)
+		{
+			for (int x = width - 1; x >= 0; --x)
+			{
+				indices[i++] = x + ((z + 1) * width);
+				indices[i++] = x + (z * width);
+			}
+		}
+		++z;
+	}
+}
 
 //----------------------------------------------------------------------------------
 
@@ -49,10 +86,14 @@ Program::~Program()
 }
 
 //----------------------------------------------------------------------------------
+extern void test();
 
 void Program::Run()
 {
 	if (!Initialise()) { return; }
+
+	test();
+
 	LoadResources();
 
 	unsigned int lastUpdate = 0;
@@ -85,7 +126,7 @@ bool Program::Initialise()
 	if (!device->Initialise()) { return false; }
 	clearState.colour = glm::vec4(0);
 
-	angle = 0.0f;
+	turningShader.angle = 0.0f;
 
 	return true;
 }
@@ -93,27 +134,42 @@ bool Program::Initialise()
 //----------------------------------------------------------------------------------
 void Program::LoadResources()
 {
+	const int width = 32;
+	const int height = 32;
+
 	vertexArray = boost::make_shared<VertexArray>();
 
-	vertexArray->indexBuffer = boost::make_shared<Buffer>(sizeof(indices), GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW);
+	std::vector<unsigned short> indices;
+	DefineIndices(width, height, indices);
+	const size_t indexBufferSize = indices.size() * sizeof(indices[0]);
+	
+	std::vector<VertexPosition> vertices;
+	DefineVertices(width, height, vertices);
+	const size_t vertexBufferSize = vertices.size() * sizeof(vertices[0]);
+
+	vertexArray->indexBuffer = boost::make_shared<Buffer>(indexBufferSize, GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW);
 	vertexArray->indexBuffer->Bind();
-	vertexArray->indexBuffer->SetData(indices, sizeof(indices), 0);
+	vertexArray->indexBuffer->SetData(indices.data(), indexBufferSize, 0);
 	vertexArray->indexBuffer->Unbind();
 
-	vertexArray->vertexBuffer = boost::make_shared<Buffer>(sizeof(vertices), GL_ARRAY_BUFFER, GL_STATIC_DRAW);
+	vertexArray->vertexBuffer = boost::make_shared<Buffer>(vertexBufferSize, GL_ARRAY_BUFFER, GL_STATIC_DRAW);
 	vertexArray->vertexBuffer->Bind();
-	vertexArray->vertexBuffer->SetData(vertices, sizeof(vertices), 0);
+	vertexArray->vertexBuffer->SetData(vertices.data(), vertexBufferSize, 0);
 	vertexArray->vertexBuffer->Unbind();
 	
 	vertexArray->vertexDecl = VertexPosition::GetVertexDecl();
 
 	renderState.vertexArray = vertexArray;
 
-	colourShader.shader = boost::make_shared<ShaderProgram>("shaders/coloured");
-	colourShader.shader->GetUniforms().at("colourToUse")->Set(glm::vec4(0.3f,0.2f,0.6f,1.0f));
-
 	turningShader.shader = boost::make_shared<ShaderProgram>("shaders/turning");
-	turningShader.angle = turningShader.shader->GetUniforms().at("angle");
+	if (turningShader.shader->Load())
+	{
+		turningShader.angleParam = turningShader.shader->GetUniforms().at("angle");
+	}
+	else
+	{
+		quit = true;
+	}
 }
 
 //----------------------------------------------------------------------------------
@@ -122,17 +178,14 @@ void Program::Update(unsigned int elapsedMS)
 	if (Keyboard::IsKeyDown(SDL_SCANCODE_ESCAPE)) { Quit(); }
 
 	const float turnRate = 3.14159f / 1000.0f;
-	angle += turnRate * (float)elapsedMS;
-	turningShader.angle->Set(angle);
+	turningShader.angle += turnRate * (float)elapsedMS;
+	turningShader.angleParam->Set(turningShader.angle);
 }
 
 //----------------------------------------------------------------------------------
 void Program::Render()
 {
 	device->Clear(clearState);
-
-	renderState.shader = colourShader.shader;
-	device->DrawIndexed(GL_TRIANGLES, 1, GL_UNSIGNED_SHORT, renderState);
 
 	renderState.shader = turningShader.shader;
 	device->DrawIndexed(GL_TRIANGLE_STRIP, 1, GL_UNSIGNED_SHORT, renderState);

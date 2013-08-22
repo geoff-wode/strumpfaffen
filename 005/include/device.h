@@ -5,6 +5,7 @@
 #include <gl_loader/gl_loader.h>
 #include <shader.h>
 #include <buffers.h>
+#include <vertexarray.h>
 
 struct ClearState
 {
@@ -33,6 +34,7 @@ struct RenderState
 
 	boost::shared_ptr<Shader> shader;
 	boost::shared_ptr<IndexBuffer> indexBuffer;
+	boost::shared_ptr<VertexArray> vertexArray;
 };
 
 namespace Device
@@ -44,7 +46,7 @@ namespace Device
 	void SetProjectionMatrix(const glm::mat4& value);
 
 	void Clear(const ClearState& clearState, GLenum buffers);
-	void Draw(const RenderState& renderState);
+	void Draw(GLenum primitiveType, size_t primitiveCount, size_t startVertex, const RenderState& renderState);
 	void SwapBuffers();
 };
 

@@ -4,12 +4,26 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
 #include <gl_loader/gl_loader.h>
+#include <buffer.h>
+#include <device.h>
+
+//----------------------------------------------------------------------------------
+
+struct ShaderUniformBlock
+{
+	GLint size;
+	boost::shared_ptr<Buffer> buffer;
+};
+typedef std::map<std::string, boost::shared_ptr<ShaderUniformBlock>> ShaderUniformBlockMap;
+
+static ShaderUniformBlockMap uniformBlocks;
 
 //----------------------------------------------------------------------------------
 
 static GLuint CompileShader(GLenum type, const char* const src, size_t srcLen);
 static void QueryShaderAttributes(GLuint program, ShaderAttributeMap& attributes);
 static void QueryShaderUniforms(GLuint program, ShaderUniformMap& uniforms);
+static void QueryShaderUniformBlocks(GLuint program);
 
 //----------------------------------------------------------------------------------
 
@@ -39,7 +53,11 @@ static const char CommonShaderSrc[] =
 //----------------------------------------------------------------------------------
 
 ShaderProgram::ShaderProgram(const std::string& name)
-	: program(glCreateProgram())
+	: name(name), program(glCreateProgram())
+{
+}
+
+bool ShaderProgram::Load()
 {
 	std::vector<std::string> files;
 	File::ListFiles(name, files);
@@ -68,10 +86,11 @@ ShaderProgram::ShaderProgram(const std::string& name)
 
 	GLint linkedOK;
 	glGetProgramiv(program, GL_LINK_STATUS, &linkedOK);
-	if (linkedOK)
+	if (GL_TRUE == linkedOK)
 	{
 		QueryShaderAttributes(program, attributes);
 		QueryShaderUniforms(program, uniforms);
+		QueryShaderUniformBlocks(program);
 	}
 	else
 	{
@@ -80,8 +99,9 @@ ShaderProgram::ShaderProgram(const std::string& name)
 		std::vector<GLchar> log(logLength+1);
 		glGetProgramInfoLog(program, logLength, NULL, log.data());
 		LOG("%s\n", log.data());
-		exit(0);
 	}
+
+	return (GL_TRUE == linkedOK);
 }
 
 //----------------------------------------------------------------------------------
@@ -184,5 +204,35 @@ static void QueryShaderUniforms(GLuint program, ShaderUniformMap& uniforms)
 			
 			uniforms[uniformName] = boost::make_shared<ShaderUniform>(types[i], glGetUniformLocation(program, uniformName));
 		}
+	}
+}
+
+//----------------------------------------------------------------------------------
+static void QueryShaderUniformBlocks(GLuint program)
+{
+	GLint numBlocks;
+	glGetProgramiv(program, GL_ACTIVE_UNIFORM_BLOCKS, &numBlocks);
+
+	std::vector<GLuint> indices(numBlocks);
+	for (GLint i = 0; i < numBlocks; ++i) { indices[i] = i; }
+
+	char blockName[256] = { 0 };
+	for (int i = 0; i < numBlocks; ++i)
+	{
+		// Get the name of the block and check if it exists in the set of blocks already encountered...
+		glGetActiveUniformBlockName(program, indices[i], sizeof(blockName)-1, NULL, blockName);
+
+		GLuint bindingIndex = Device::GetBlockBindingIndex(blockName);
+		if (GL_INVALID_INDEX == bindingIndex)
+		{
+			GLint blockSize;
+			glGetActiveUniformBlockiv(program, indices[i], GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);
+			Device::CreateBlockBuffer(blockName, blockSize);
+			bindingIndex = Device::GetBlockBindingIndex(blockName);
+		}
+
+		const GLuint blockIndex = glGetUniformBlockIndex(program, blockName);
+
+		glUniformBlockBinding(program, blockIndex, bindingIndex);
 	}
 }

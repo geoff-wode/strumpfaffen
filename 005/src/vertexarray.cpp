@@ -1,37 +1,6 @@
 #include <debug.h>
 #include <vertexarray.h>
-
-//----------------------------------------------------------------------------------
-
-static struct AttribLocations
-{
-	const std::string semantic;
-	const GLuint location;
-} attribLocations[] =
-{
-	{ "VertexPosition"    , 0  },
-	{ "VertexPositionLow" , 0  },
-	{ "VertexPositionHigh", 1  },
-	{ "VertexColour"      , 2  },
-	{ "VertexNormal"      , 3  },
-	{ "VertexTexCoord0"   , 4  },
-	{ "VertexTexCoord1"   , 5  },
-	{ "VertexTexCoord2"   , 6  },
-	{ "VertexTexCoord3"   , 7  },
-	{ "VertexTexCoord4"   , 8  },
-	{ "VertexTexCoord5"   , 9  },
-	{ "VertexTexCoord6"   , 10 },
-	{ "VertexTexCoord7"   , 11 },
-	{ "VertexTexCoord8"   , 12 },
-	{ "VertexTexCoord9"   , 13 },
-	{ "VertexTexCoord10"  , 14 },
-	{ "VertexTexCoord11"  , 15 },
-	{ "VertexTexCoord12"  , 16 },
-	{ "VertexTexCoord13"  , 17 },
-	{ "VertexTexCoord14"  , 18 },
-	{ "VertexTexCoord15"  , 19 }
-};
-static const size_t NumAttribLocations = sizeof(attribLocations) / sizeof(attribLocations[0]);
+#include "shadersemantics.h"
 
 //----------------------------------------------------------------------------------
 
@@ -76,11 +45,11 @@ void VertexArray::Enable()
 //----------------------------------------------------------------------------------
 static GLuint GetAttribLocation(const std::string& semantic)
 {
-	for (size_t i = 0; i < NumAttribLocations; ++i)
+	for (size_t i = 0; i < NumShaderSemantics; ++i)
 	{
-		if (attribLocations[i].semantic == semantic) { return attribLocations[i].location; }
+		if (shaderSemantics[i] == semantic) { return i; }
 	}
-	LOG("WARNING: unknown attribute semantic (%s) in shader\n", semantic);
+	LOG("WARNING: unknown attribute semantic (%s) in shader\n", semantic.c_str());
 	return 0;
 }
 

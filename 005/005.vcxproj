@@ -27,7 +27,12 @@
     <ClInclude Include="include\buffers.h" />
     <ClInclude Include="include\shader.h" />
     <ClInclude Include="include\vertexarray.h" />
+    <ClInclude Include="src\shadersemantics.h" />
     <ClInclude Include="src\shaderuniformimpl.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\passthru\fs.glsl" />
+    <None Include="shaders\passthru\vs.glsl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{0CF7D402-2FD3-40B2-9DFA-47EBDD1C96E0}</ProjectGuid>

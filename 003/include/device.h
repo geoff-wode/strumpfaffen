@@ -1,11 +1,13 @@
 #if ! defined(__DEVICE__)
 #define __DEVICE__
 
+#include <map>
 #include <SDL.h>
 #include <glm/glm.hpp>
 #include <viewport.h>
 #include <clearstate.h>
 #include <renderstate.h>
+#include <boost/make_shared.hpp>
 
 class Device
 {
@@ -25,6 +27,14 @@ public:
 
 	void SwapBuffers() const;
 
+	static void CreateBlockBuffer(const std::string& name, size_t size);
+	static GLuint GetBlockBindingIndex(const std::string& name);
+	static boost::shared_ptr<Buffer> GetBlockBuffer(const std::string& name);
+
+	glm::mat4 WorldMatrix;
+	glm::mat4 ViewMatrix;
+	glm::mat4 ProjectionMatrix;
+
 private:
 	SDL_Window* mainWindow;
 	Viewport viewport;
@@ -32,12 +42,14 @@ private:
 	RenderState renderState;
 	glm::ivec2 backbufferSize;
 
+	typedef std::map<std::string,boost::shared_ptr<Buffer>> UniformBlockBufferMap;
+	static UniformBlockBufferMap blocks;
+
 	boost::shared_ptr<Buffer> activeVertexBuffer;
 	boost::shared_ptr<Buffer> activeIndexBuffer;
 	boost::shared_ptr<ShaderProgram> activeShader;
 
 	void ApplyClearState(const ClearState& newState);
-
 	void ApplyRenderState(const RenderState& newState);
 	void ApplyColourMask(const glm::bvec4& mask);
 	void ApplyDepthMask(bool mask);

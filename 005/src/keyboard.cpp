@@ -2,8 +2,6 @@
 #include <keyboard.h>
 #include <boost/make_shared.hpp>
 
-using namespace input;
-
 //-------------------------------------------------------------------
 
 class KeyboardStateImpl : public IKeyboardState

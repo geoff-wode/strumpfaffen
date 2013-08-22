@@ -28,16 +28,11 @@ private:
 
 	boost::shared_ptr<VertexArray> vertexArray;
 	
-	float angle;
-	struct ColouredShader
-	{
-		boost::shared_ptr<ShaderProgram> shader;
-	} colourShader;
-
 	struct TurningShader
 	{
+		float angle;
 		boost::shared_ptr<ShaderProgram> shader;
-		boost::shared_ptr<ShaderUniform> angle;
+		boost::shared_ptr<ShaderUniform> angleParam;
 	} turningShader;
 
 	ClearState clearState;

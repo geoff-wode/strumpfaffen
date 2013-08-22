@@ -6,13 +6,13 @@
 #version 330
 
 // TODO: Implement shared uniform blocks in the shader infrastructure...
-//layout (std140) uniform CommonShaderVarsBlock
-//{
-//	mat4 ViewMatrix;
-//	mat4 ProjectionMatrix;
-//	mat4 ViewProjectionMatrix;
-//	vec4 CameraPos;
-//};
+layout (std140) uniform GlobalShaderUniforms
+{
+	vec4 CameraPos;
+	mat4 ViewMatrix;
+	mat4 ProjectionMatrix;
+	mat4 ViewProjectionMatrix;
+};
 
 // Common vertex attributes. To add more attributes, use the following idiom:
 //    layout(location = USER_VERTEX_ATTR_LOCATION + n) { blah }

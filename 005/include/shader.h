@@ -30,33 +30,6 @@ public:
 typedef boost::shared_ptr<ShaderUniform> ShaderUniformPtr;
 typedef std::map<std::string, ShaderUniformPtr> ShaderUniformMap;
 
-// Shader semantics allow user code to correctly associate a vertex attribute
-// to a shader input attribute 
-namespace ShaderSemantics
-{
-	static const std::string Position    = "Position";
-	static const std::string PositionLow = "PositionLow";		// Used when emulating double-precision maths on the GPU.
-	static const std::string PositionHigh= "PositionHigh";	// Used when emulating double-precision maths on the GPU.
-	static const std::string Colour			 = "Colour";
-	static const std::string Normal			 = "Normal";
-	static const std::string TexCoord0	 = "TexCoord0";
-	static const std::string TexCoord1	 = "TexCoord1";
-	static const std::string TexCoord2	 = "TexCoord2";
-	static const std::string TexCoord3	 = "TexCoord3";
-	static const std::string TexCoord4	 = "TexCoord4";
-	static const std::string TexCoord5	 = "TexCoord5";
-	static const std::string TexCoord6	 = "TexCoord6";
-	static const std::string TexCoord7	 = "TexCoord7";
-	static const std::string TexCoord8	 = "TexCoord8";
-	static const std::string TexCoord9	 = "TexCoord9";
-	static const std::string TexCoord10	 = "TexCoord10";
-	static const std::string TexCoord11	 = "TexCoord11";
-	static const std::string TexCoord12	 = "TexCoord12";
-	static const std::string TexCoord13	 = "TexCoord13";
-	static const std::string TexCoord14	 = "TexCoord14";
-	static const std::string TexCoord15	 = "TexCoord15";
-}
-
 class Shader
 {
 public:
@@ -65,13 +38,15 @@ public:
 
 	bool Build();
 
-	void Apply();
+	void Enable();
+
+	void ApplyUniforms();
 
 	const ShaderUniformMap& Uniforms;
 
 private:
-	const std::string& name;
-	GLuint handle;
+	const std::string name;
+	GLuint program;
 	ShaderUniformMap uniforms;
 };
 

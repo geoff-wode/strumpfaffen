@@ -1,8 +1,6 @@
-in vec3 theColour;
-
-out vec4 outFragmentColour;
+out vec4 fragColour;
 
 void main()
 {
-  outFragmentColour = vec4(theColour,1);
+  fragColour = vec4(0,0,1,1);
 }

@@ -4,22 +4,19 @@
 #include <SDL.h>
 #include <boost/shared_ptr.hpp>
 
-namespace input
+class IKeyboardState
 {
-	class IKeyboardState
-	{
-	public:
-		virtual bool IsKeyDown(SDL_Scancode key) const = 0;
-		virtual bool IsKeyUp(SDL_Scancode key) const = 0;
-	};
+public:
+	virtual bool IsKeyDown(SDL_Scancode key) const = 0;
+	virtual bool IsKeyUp(SDL_Scancode key) const = 0;
+};
 
-	typedef boost::shared_ptr<IKeyboardState> KeyboardState;
+typedef boost::shared_ptr<IKeyboardState> KeyboardState;
 
-	class Keyboard
-	{
-	public:
-		static KeyboardState GetState();
-	};
-}
+class Keyboard
+{
+public:
+	static KeyboardState GetState();
+};
 
 #endif // __INPUT_KEYBOARD__

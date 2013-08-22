@@ -39,6 +39,8 @@ static void ApplyColourMask(const glm::bvec4& value);
 static void ApplyDepthMask(bool value);
 static void ApplyIndexBuffer(boost::shared_ptr<IndexBuffer> buffer);
 static void ApplyUniformBuffer();
+static void ApplyShader(boost::shared_ptr<Shader> value);
+static void ApplyVertexArray(boost::shared_ptr<VertexArray> value);
 
 //---------------------------------------------------
 
@@ -77,6 +79,8 @@ bool Device::Initialise()
   LOG("GLSL v%s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
 
 	InitialiseGLState();
+
+	return true;
 }
 
 //---------------------------------------------------
@@ -136,12 +140,30 @@ void Device::Clear(const ClearState& clearState, GLenum buffers)
 
 //---------------------------------------------------
 
-void Device::Draw(const RenderState& renderState)
+void Device::Draw(GLenum primitiveType, size_t primitiveCount, size_t startVertex, const RenderState& renderState)
 {
 	ApplyUniformBuffer();
 	ApplyColourMask(renderState.colourMask);
 	ApplyDepthMask(renderState.depthMask);
+	ApplyVertexArray(renderState.vertexArray);
 	ApplyIndexBuffer(renderState.indexBuffer);
+	ApplyShader(renderState.shader);
+
+	size_t vertexCount = 0;
+	switch (primitiveType)
+	{
+	case GL_TRIANGLES: vertexCount = primitiveCount * 3; break;
+	case GL_TRIANGLE_STRIP: vertexCount = primitiveCount + 2; break;
+	default: return;
+	}
+
+	if (glState.renderState.indexBuffer)
+	{
+	}
+	else
+	{
+		glDrawArrays(primitiveType, startVertex, vertexCount);
+	}
 }
 
 //---------------------------------------------------
@@ -207,6 +229,17 @@ static void ConfigureGL()
 }
 
 //---------------------------------------------------
+static void ApplyShader(boost::shared_ptr<Shader> value)
+{
+	if (glState.renderState.shader != value)
+	{
+		glState.renderState.shader = value;
+		glState.renderState.shader->Enable();
+	}
+	glState.renderState.shader->ApplyUniforms();
+}
+
+//---------------------------------------------------
 static void ApplyColourMask(const glm::bvec4& value)
 {
 	// The colour mask controls rendering as well as clearing, so the value
@@ -263,5 +296,15 @@ static void ApplyUniformBuffer()
 		uniformBuffer->Disable();
 
 		uniformBufferChanged = false;
+	}
+}
+
+//---------------------------------------------------
+static void ApplyVertexArray(boost::shared_ptr<VertexArray> value)
+{
+	if (glState.renderState.vertexArray != value)
+	{
+		glState.renderState.vertexArray = value;
+		glState.renderState.vertexArray->Enable();
 	}
 }
