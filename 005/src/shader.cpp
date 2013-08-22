@@ -85,6 +85,7 @@ const size_t NumShaderSemantics = sizeof(shaderSemantics) / sizeof(shaderSemanti
 
 static GLuint CompileShader(GLenum type, const char* const src, size_t srcLen);
 static void QueryShaderUniforms(GLuint program, ShaderUniformMap& uniforms);
+static void QueryShaderAttributes(GLuint program);
 
 //--------------------------------------------------------
 
@@ -135,6 +136,7 @@ bool Shader::Build()
 	glGetProgramiv(program, GL_LINK_STATUS, &linkedOK);
 	if (GL_TRUE == linkedOK)
 	{
+		QueryShaderAttributes(program);
 		QueryShaderUniforms(program, uniforms);
 	}
 	else
@@ -228,6 +230,37 @@ static void QueryShaderUniforms(GLuint program, ShaderUniformMap& uniforms)
 			glGetActiveUniformName(program, i, sizeof(uniformName)-1, NULL, uniformName);
 			
 			uniforms[uniformName] = boost::make_shared<ShaderUniformImpl>(types[i], glGetUniformLocation(program, uniformName));
+		}
+	}
+}
+
+
+//----------------------------------------------------------------------------------
+static void QueryShaderAttributes(GLuint program)
+{
+	GLint numAttributes;
+	glGetProgramiv(program, GL_ACTIVE_ATTRIBUTES, &numAttributes);
+
+	for (GLint i = 0; i < numAttributes; ++i)
+	{
+		char attrName[128];
+		GLint numUnits;
+		GLenum type;
+		glGetActiveAttrib(program, i, sizeof(attrName)-1, NULL, &numUnits, &type, attrName);
+		if (numUnits > 1)
+		{
+			for (GLint unit = 0; unit < numUnits; ++unit)
+			{
+				char unitName[256];
+				sprintf(unitName, "%s[%d]", attrName, unit);
+				const GLint location = glGetAttribLocation(program, unitName);
+				LOG("shader attrib %d: %s - %d x %s @ %d\n", i, unitName, numUnits, GetAttribTypeName(type), location);
+			}
+		}
+		else
+		{
+			const GLint location = glGetAttribLocation(program, attrName);
+			LOG("shader attrib %d: %s - %d x %s @ %d\n", i, attrName, numUnits, GetAttribTypeName(type), location);
 		}
 	}
 }

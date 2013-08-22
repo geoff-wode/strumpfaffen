@@ -42,7 +42,7 @@ public:
 
 	void ApplyUniforms();
 
-	const ShaderUniformMap& Uniforms;
+	ShaderUniformMap& Uniforms;
 
 private:
 	const std::string name;

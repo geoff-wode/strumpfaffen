@@ -24,5 +24,9 @@ extern FILE* debugLogFile;
     } \
   } while (0)
 
+
+// Given a GL data type, return a text equivalent.
+const char* const GetAttribTypeName(unsigned int type);
+
 #endif // __DEBUG_H__
 

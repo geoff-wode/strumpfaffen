@@ -47,7 +47,7 @@ static GLuint GetAttribLocation(const std::string& semantic)
 {
 	for (size_t i = 0; i < NumShaderSemantics; ++i)
 	{
-		if (shaderSemantics[i] == semantic) { return i; }
+		if (shaderSemantics[i] == semantic) { return (i > 0) ? (i - 1) : i; }
 	}
 	LOG("WARNING: unknown attribute semantic (%s) in shader\n", semantic.c_str());
 	return 0;
@@ -71,6 +71,13 @@ static GLuint CreateVertexArray(const VertexArray::DeclarationList& declarations
 			const GLuint attribIndex = GetAttribLocation((*iter)->attributes[i].semantic);
 
 			// Now, enable and configure that particular location...
+			LOG(
+				"vertex array: %s - %d x %s @ %d\n",
+				(*iter)->attributes[i].semantic.c_str(),
+				(*iter)->attributes[i].size,
+				GetAttribTypeName((*iter)->attributes[i].type),
+				attribIndex
+				);
 			glEnableVertexAttribArray(attribIndex);
 			glVertexAttribPointer(attribIndex, (*iter)->attributes[i].size, (*iter)->attributes[i].type, GL_FALSE, (*iter)->stride, (const void*)(*iter)->attributes[i].offset);
 		}

@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\buffers.cpp" />
+    <ClCompile Include="src\debug.cpp" />
     <ClCompile Include="src\device.cpp" />
     <ClCompile Include="src\files.cpp" />
     <ClCompile Include="src\keyboard.cpp" />
@@ -31,6 +32,8 @@
     <ClInclude Include="src\shaderuniformimpl.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="shaders\bricks\fs.glsl" />
+    <None Include="shaders\bricks\vs.glsl" />
     <None Include="shaders\passthru\fs.glsl" />
     <None Include="shaders\passthru\vs.glsl" />
   </ItemGroup>
