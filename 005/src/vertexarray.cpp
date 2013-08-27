@@ -79,7 +79,13 @@ static GLuint CreateVertexArray(const VertexArray::DeclarationList& declarations
 				attribIndex
 				);
 			glEnableVertexAttribArray(attribIndex);
-			glVertexAttribPointer(attribIndex, (*iter)->attributes[i].size, (*iter)->attributes[i].type, GL_FALSE, (*iter)->stride, (const void*)(*iter)->attributes[i].offset);
+			glVertexAttribPointer(
+				attribIndex,
+				(*iter)->attributes[i].size,
+				(*iter)->attributes[i].type,
+				GL_FALSE,
+				(*iter)->stride,
+				(const void*)(*iter)->attributes[i].offset);
 		}
 	}
 

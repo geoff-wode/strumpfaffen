@@ -57,8 +57,12 @@ public:
 
 //----------------------------------------------------------------------------------
 
-boost::shared_ptr<IndexBuffer> CreateIndexBuffer(size_t size, GLenum type, GLenum usage);
-boost::shared_ptr<VertexBuffer> CreateVertexBuffer(size_t size, GLenum usage);
-boost::shared_ptr<UniformBuffer> CreateUniformBuffer(size_t size, GLenum usage);
+typedef boost::shared_ptr<IndexBuffer> 		IndexBufferPtr;
+typedef boost::shared_ptr<VertexBuffer>		VertexBufferPtr;
+typedef boost::shared_ptr<UniformBuffer> 	UniformBufferPtr;
+
+IndexBufferPtr CreateIndexBuffer(size_t size, GLenum type, GLenum usage);
+VertexBufferPtr CreateVertexBuffer(size_t size, GLenum usage);
+UniformBufferPtr CreateUniformBuffer(size_t size, GLenum usage);
 
 #endif // __BUFFERS__

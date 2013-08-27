@@ -1,4 +1,3 @@
-
 out vec4 outFragmentColour;
 
 void main()

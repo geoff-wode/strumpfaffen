@@ -39,7 +39,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir);$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir);$(ProjectDir)include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)lib\$(Configuration);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -50,18 +51,26 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>gl_loader.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>msvcrt.lib</IgnoreSpecificDefaultLibraries>
     </Link>
     <PostBuildEvent>
       <Command>@echo off
 
-if exist $(SDL_DIR)lib\x86\SDL.dll (
-  echo Copying SDL runtime...
-  xcopy $(SDL_DIR)lib\x86\SDL.dll $(OutDir) /r/y
+if exist $(SDL2_DIR)lib\$(PlatformShortName)\SDL2.dll (
+  echo Copying SDL2 runtime...
+  xcopy $(SDL2_DIR)lib\$(PlatformShortName)\SDL2.dll $(OutDir) /r/y
+  if errorlevel 1 goto OnFault
+)
+
+if exist $(FREEIMAGE_DIR)lib\$(PlatformShortName)\FreeImage.dll (
+  echo Copying SDL2 runtime...
+  xcopy $(FREEIMAGE_DIR)lib\$(PlatformShortName)\FreeImage.dll $(OutDir) /r/y
   if errorlevel 1 goto OnFault
 )
 
@@ -112,15 +121,27 @@ echo Build post-step for $(ProjectName) complete.
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="device.cpp" />
     <ClCompile Include="files.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="shader.cpp" />
+    <ClCompile Include="shadersemantic.cpp" />
+    <ClCompile Include="terrain\tile.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="buffers.h" />
     <ClInclude Include="debug.h" />
     <ClInclude Include="files.h" />
+    <ClInclude Include="device.h" />
+    <ClInclude Include="shader.h" />
+    <ClInclude Include="shadersemantic.h" />
+    <ClInclude Include="shaderuniformimpl.h" />
+    <ClInclude Include="renderstate.h" />
+    <ClInclude Include="terrain\tile.h" />
+    <ClInclude Include="vertexlayout.h" />
+    <ClInclude Include="vertexelement.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\common.glsl" />
     <None Include="shaders\simple\fs.glsl" />
     <None Include="shaders\simple\vs.glsl" />
   </ItemGroup>

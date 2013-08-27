@@ -7,6 +7,7 @@
 #include <buffers.h>
 #include <keyboard.h>
 #include <vertexarray.h>
+#include <scenegraph/scene.h>
 
 //----------------------------------------------------------------------------------
 
@@ -29,6 +30,7 @@ FILE* debugLogFile;
 static bool quit = false;
 static KeyboardState oldKeyState;
 static RenderState renderState;
+static boost::shared_ptr<Scene> scene;
 
 //----------------------------------------------------------------------------------
 
@@ -94,6 +96,7 @@ static bool Initialise()
 	VertexBuffer::Disable();
 
 	VertexDeclarationPtr decl(new VertexDeclaration(sizeof(Vertex), vb, attrs, 2));
+
 	renderState.vertexArray = boost::make_shared<VertexArray>(&decl, 1);
 
 	renderState.indexBuffer = CreateIndexBuffer(sizeof(indices), GL_UNSIGNED_SHORT, GL_STATIC_DRAW);
@@ -105,6 +108,8 @@ static bool Initialise()
 	if (!renderState.shader->Build()) { return false; }
 
 	oldKeyState = Keyboard::GetState();
+
+	scene = boost::make_shared<Scene>();
 
 	return true;
 }

@@ -80,6 +80,9 @@ bool Device::Initialise()
 
 	InitialiseGLState();
 
+	GLint maxVertexAttrs;
+	glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &maxVertexAttrs);
+
 	return true;
 }
 

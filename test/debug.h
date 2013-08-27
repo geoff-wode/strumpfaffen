@@ -4,9 +4,13 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-#if defined(ENABLE_DEBUG)
+extern FILE* debugLogFile;
 
-#define LOG(msg, ...) fprintf(stderr, msg, __VA_ARGS__)
+#define LOG(msg, ...) \
+	do \
+	{ \
+		fprintf(debugLogFile, msg, __VA_ARGS__); \
+	} while (0)
 
 #define ASSERT(pred) ASSERTM(pred, "")
 
@@ -20,14 +24,9 @@
     } \
   } while (0)
 
-#else // ! ENABLE_DEBUG
 
-#define LOG(msg, ...)	do { } while (0)
-
-#define ASSERT(pred)	do { } while (0)
-
-#define ASSERTM(pred, msg, ...) do { } while (0)
-
-#endif // ENABLE_DEBUG
+// Given a GL data type, return a text equivalent.
+const char* const GetAttribTypeName(unsigned int type);
 
 #endif // __DEBUG_H__
+

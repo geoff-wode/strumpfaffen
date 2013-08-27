@@ -17,6 +17,10 @@
     <ClCompile Include="src\files.cpp" />
     <ClCompile Include="src\keyboard.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\scenegraph\geometrynode.cpp" />
+    <ClCompile Include="src\scenegraph\scene.cpp" />
+    <ClCompile Include="src\scenegraph\scenenode.cpp" />
+    <ClCompile Include="src\scenegraph\transformnode.cpp" />
     <ClCompile Include="src\shader.cpp" />
     <ClCompile Include="src\vertexarray.cpp" />
   </ItemGroup>
@@ -26,8 +30,15 @@
     <ClInclude Include="include\files.h" />
     <ClInclude Include="include\keyboard.h" />
     <ClInclude Include="include\buffers.h" />
+    <ClInclude Include="include\scenegraph\geometrynode.h" />
+    <ClInclude Include="include\scenegraph\matrixstack.h" />
+    <ClInclude Include="include\scenegraph\scene.h" />
+    <ClInclude Include="include\scenegraph\scenenode.h" />
+    <ClInclude Include="include\scenegraph\transformnode.h" />
     <ClInclude Include="include\shader.h" />
     <ClInclude Include="include\vertexarray.h" />
+    <ClInclude Include="include\vertexattribute.h" />
+    <ClInclude Include="include\vertexdeclaration.h" />
     <ClInclude Include="src\shadersemantics.h" />
     <ClInclude Include="src\shaderuniformimpl.h" />
   </ItemGroup>
