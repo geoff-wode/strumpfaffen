@@ -32,9 +32,8 @@ template <typename T> static void BuildIndices(int size, std::vector<T>& indices
 
 //--------------------------------------------------------------------------------------------
 
-TileNode::TileNode(SceneNodePtr parent, size_t gridSize)
-	: TransformNode(parent),
-		gridSize(gridSize),
+TileNode::TileNode(size_t gridSize)
+	: gridSize(gridSize),
 		numElements(2 * gridSize * (gridSize - 1))
 {
 }
@@ -83,15 +82,11 @@ bool TileNode::PreRender(Scene* const scene)
 //--------------------------------------------------------------------------------------------
 void TileNode::Render(Scene* const scene)
 {
-	// Get the current render state so that parent nodes can decide which shader, etc. to use...
-	RenderState renderState = scene->device.CurrentRenderState();
+	scene->renderState.indexBuffer = indexBuffer;
+	scene->renderState.vertexBuffer = vertexBuffer;
+	scene->renderState.vertexLayout = &vertexLayout;
 
-	// ...but need to render our own stuff...
-	renderState.indexBuffer = indexBuffer;
-	renderState.vertexBuffer = vertexBuffer;
-	renderState.vertexLayout = &vertexLayout;
-
-	scene->device.Draw(GL_TRIANGLE_STRIP, 0, numElements, renderState);
+	scene->device.Draw(GL_TRIANGLE_STRIP, 0, numElements, scene->renderState);
 }
 
 //--------------------------------------------------------------------------------------------

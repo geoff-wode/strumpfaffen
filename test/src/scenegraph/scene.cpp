@@ -15,23 +15,16 @@ Scene::~Scene()
 
 void Scene::LoadContent()
 {
-	if (root) { root->LoadContent(this); }
+	if (root) { root->LoadNodeContent(this); }
 }
 
 void Scene::Update(unsigned int elapsedMS)
 {
-	if (root) { root->Update(this, elapsedMS); }
+	if (movementController) { movementController->Update(elapsedMS); }
+	if (root) { root->UpdateNode(this, elapsedMS); }
 }
 
 void Scene::Render()
 {
-	if (root)
-	{
-		if (root->PreRender(this))
-		{
-			root->Render(this);
-			root->RenderChildren(this);
-			root->PostRender(this);
-		}
-	}
+	if (root) { root->RenderNode(this); }
 }

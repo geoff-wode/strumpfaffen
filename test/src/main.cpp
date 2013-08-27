@@ -12,7 +12,11 @@
 
 #include <device.h>
 #include <shader.h>
-#include <terrain/tile.h>
+#include <scenegraph/scene.h>
+#include <scenegraph/cameranode.h>
+#include <scenegraph/shadernode.h>
+#include <scenegraph/terrain/tilenode.h>
+#include <movementcontroller.h>
 
 //--------------------------------------------------------------------------------------------
 
@@ -31,14 +35,27 @@ int main(int argc, char* argv[])
 	Init();
 	Device device;
 
-	Shader shader = boost::make_shared<ShaderClass>("shaders/simple");
-	shader->Build();
-
-	TerrainTile tile(10);
-
-	device.WorldMatrix = glm::translate(glm::vec3(0,0,0));
-	device.ViewMatrix = glm::lookAt(glm::vec3(0,2,4), glm::vec3(0), glm::vec3(0,1,0));
+	//device.WorldMatrix = glm::translate(glm::vec3(0,0,0));
+	//device.ViewMatrix = glm::lookAt(glm::vec3(0,2,4), glm::vec3(0), glm::vec3(0,1,0));
 	device.ProjectionMatrix = glm::perspective(45.0f, 800.0f/600.0f, 0.1f, 100.0f);
+
+	Scene scene(device);
+	scene.root = boost::make_shared<TransformNode>();
+
+	boost::shared_ptr<CameraNode> camera(new CameraNode());
+	boost::shared_ptr<ShaderNode> shader(new ShaderNode("shaders/simple"));
+	boost::shared_ptr<TileNode> tile(new TileNode(5));
+
+	camera->SetTransform(glm::mat4(glm::translate(0,2,4)));
+
+	scene.root->children.push_back(camera);
+	scene.root->children.push_back(shader);
+
+	shader->children.push_back(tile);
+
+	scene.movementController = boost::make_shared<MovementController>(camera);
+
+	scene.LoadContent();
 
 	bool quit = false;
 	do
@@ -54,9 +71,11 @@ int main(int argc, char* argv[])
 			}
 		}
 
+		scene.Update(0);
+
 		glClear(GL_COLOR_BUFFER_BIT);
 		
-		tile.Draw(device, shader);
+		scene.Render();
 
 		SDL_GL_SwapWindow(mainWindow);
 	} while (!quit);

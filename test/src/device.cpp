@@ -67,13 +67,6 @@ void Device::Draw(GLenum primitiveType, size_t start, size_t count, const Render
 
 //--------------------------------------------------------------------------------------------
 
-const RenderState& Device::CurrentRenderState() const
-{
-	return renderState;
-}
-
-//--------------------------------------------------------------------------------------------
-
 void Device::ApplyUniformBuffer()
 {
 	bool update = false;

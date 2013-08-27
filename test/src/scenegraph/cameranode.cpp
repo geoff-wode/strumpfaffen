@@ -1,8 +1,7 @@
 #include <scenegraph/cameranode.h>
 #include <scenegraph/scene.h>
 
-CameraNode::CameraNode(SceneNodePtr parent)
-	: TransformNode(parent)
+CameraNode::CameraNode()
 {
 }
 

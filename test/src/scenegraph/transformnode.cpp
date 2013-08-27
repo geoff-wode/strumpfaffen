@@ -3,9 +3,8 @@
 
 //-----------------------------------------------------------
 
-TransformNode::TransformNode(SceneNodePtr parent)
-	: SceneNode(parent),
-		ToWorld(toWorld), FromWorld(fromWorld),
+TransformNode::TransformNode()
+	: ToWorld(toWorld), FromWorld(fromWorld),
 		toWorld(glm::mat4(1)), fromWorld(glm::mat4(1))
 {
 }
@@ -27,12 +26,12 @@ void TransformNode::PostRender(Scene* const scene)
 
 //-----------------------------------------------------------
 
-void TransformNode::SetTransform(const glm::mat4& toWorld)
+void TransformNode::SetTransform(glm::mat4& toWorld)
 {
 	SetTransform(toWorld, glm::inverse(toWorld));
 }
 
-void TransformNode::SetTransform(const glm::mat4& toWorld, const glm::mat4& fromWorld)
+void TransformNode::SetTransform(glm::mat4& toWorld, glm::mat4& fromWorld)
 {
 	this->toWorld = toWorld;
 	this->fromWorld = fromWorld;

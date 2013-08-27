@@ -9,7 +9,7 @@ class TileNode : public TransformNode
 public:
 	// Create a tile on the XZ plane which is gridSize points in width and length.
 	// For texturing to work correctly, gridSize should be (2^N)+1 in size.
-	TileNode(SceneNodePtr parent, size_t gridSize);
+	TileNode(size_t gridSize);
 
 	virtual void LoadContent(Scene* const scene);
 	virtual bool PreRender(Scene* const scene);

@@ -4,8 +4,7 @@
 
 //-----------------------------------------------------------
 
-SceneNode::SceneNode(SceneNodePtr parent)
-	: parent(parent)
+SceneNode::SceneNode()
 {
 }
 
@@ -19,60 +18,44 @@ SceneNode::~SceneNode()
 
 //-----------------------------------------------------------
 
-void SceneNode::LoadContent(Scene* const scene)
+void SceneNode::LoadNodeContent(Scene* const scene)
 {
+	// Make a copy of the child list in case this node wants to modify it in some way...
+	const SceneNodeList listCopy(children);
+
+	LoadContent(scene);
+
 	BOOST_FOREACH(auto node, children)
 	{
-		node->LoadContent(scene);
+		node->LoadNodeContent(scene);
 	}
 }
 
 //-----------------------------------------------------------
 
-void SceneNode::Update(Scene* const scene, unsigned int elapsedMS)
+void SceneNode::UpdateNode(Scene* const scene, unsigned int elapsedMS)
 {
-	BOOST_FOREACH(auto node, children)
+	// Make a copy of the child list in case this node wants to modify it in some way...
+	const SceneNodeList listCopy(children);
+
+	Update(scene, elapsedMS);
+
+	BOOST_FOREACH(auto node, listCopy)
 	{
-		node->Update(scene, elapsedMS);
+		node->UpdateNode(scene, elapsedMS);
 	}
 }
 
 //-----------------------------------------------------------
-
-bool SceneNode::PreRender(Scene* const scene)
+void SceneNode::RenderNode(Scene* const scene)
 {
-	return true;
-}
-
-void SceneNode::Render(Scene* const scene)
-{
-}
-
-void SceneNode::PostRender(Scene* const scene)
-{
-}
-
-//-----------------------------------------------------------
-
-void SceneNode::SetTransform(const glm::mat4& toWorld)
-{
-	SetTransform(toWorld, glm::inverse(toWorld));
-}
-
-void SceneNode::SetTransform(const glm::mat4& toWorld, const glm::mat4& fromWorld)
-{
-}
-
-//-----------------------------------------------------------
-void SceneNode::RenderChildren(Scene* const scene)
-{
-	BOOST_FOREACH(auto node, children)
+	if (PreRender(scene))
 	{
-		if (node->PreRender(scene))
+		Render(scene);
+		BOOST_FOREACH(auto node, children)
 		{
-			node->Render(scene);
-			node->RenderChildren(scene);
-			node->PostRender(scene);
+			node->RenderNode(scene);
 		}
+		PostRender(scene);
 	}
 }

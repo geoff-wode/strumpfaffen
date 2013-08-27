@@ -14,28 +14,41 @@ typedef std::list<SceneNodePtr> SceneNodeList;
 class SceneNode : public boost::noncopyable
 {
 public:
-	const SceneNodePtr	parent;
-
 	SceneNodeList				children;
 
-	SceneNode(SceneNodePtr parent);
+	SceneNode();
 
 	virtual ~SceneNode();
 
-	virtual void LoadContent(Scene* const scene);
+	void LoadNodeContent(Scene* const scene);
 
-	virtual void Update(Scene* const scene, unsigned int elapsedMS);
+	void UpdateNode(Scene* const scene, unsigned int elapsedMS);
 
-	// Allow for early-out on rendering segments of the scene graph by returning false...
-	virtual bool PreRender(Scene* const scene);
+	void RenderNode(Scene* const scene);
 
-	virtual void Render(Scene* const scene);
-	virtual void PostRender(Scene* const scene);
+	virtual void SetTransform(glm::mat4& toWorld) { }
+	virtual void SetTransform(glm::mat4& toWorld, glm::mat4& fromWorld) { }
 
-	virtual void SetTransform(const glm::mat4& toWorld);
-	virtual void SetTransform(const glm::mat4& toWorld, const glm::mat4& fromWorld);
+private:
+	// These are the interfaces that concrete scene nodes should implement...
 
-	void RenderChildren(Scene* const scene);
+	// Implement this to initialise runtime content, load shaders, etc.
+	virtual void LoadContent(Scene* const scene) { }
+
+	// Implement this to modify the internal state of the node.
+	virtual void Update(Scene* const scene, unsigned int elapsedMS) { }
+
+	// Implememt this to perform actions just before rendering starts, e.g. visibility test.
+	// Return false to prevent this _and_all_subsequent_ nodes from being rendered.
+	virtual bool PreRender(Scene* const scene) { return true; }
+
+	// Implement this to light up pixels, or otherwise perform "Magic". It's only called if
+	// the node's PreRender() has returned true. 
+	virtual void Render(Scene* const scene) { }
+
+	// Implement this to perform actions after rendering, like save a texture out of the GPU
+	// back into real memory. It's only called if the node's PreRender() has returned true.
+	virtual void PostRender(Scene* const scene) { }
 };
 
 #endif // __SCENE_NODE__

@@ -10,7 +10,7 @@
 class CameraNode : public TransformNode
 {
 public:
-	CameraNode(SceneNodePtr parent);
+	CameraNode();
 
 	virtual void Update(Scene* const scene, unsigned int elapsedMS);
 };
