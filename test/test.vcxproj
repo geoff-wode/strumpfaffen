@@ -137,6 +137,7 @@ echo Build post-step for $(ProjectName) complete.
     <ClInclude Include="include\debug.h" />
     <ClInclude Include="include\files.h" />
     <ClInclude Include="include\device.h" />
+    <ClInclude Include="include\input\keyboard.h" />
     <ClInclude Include="include\movementcontroller.h" />
     <ClInclude Include="include\scenegraph\cameranode.h" />
     <ClInclude Include="include\scenegraph\matrixstack.h" />

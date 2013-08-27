@@ -16,6 +16,14 @@ public:
 	
 	void Update(unsigned int elapsedMS);
 
+	void OnKeyDown(SDL_Scancode key);
+	void OnKeyUp(SDL_Scancode key);
+	void OnMouseMove(const glm::ivec2& delta);
+	void OnMouseLeftButtonDown(const glm::ivec2& pos);
+	void OnMouseLeftButtonUp(const glm::ivec2& pos);
+	void OnMouseRightButtonDown(const glm::ivec2& pos);
+	void OnMouseRightButtonUp(const glm::ivec2& pos);
+
 private:
 	glm::mat4		toWorld;
 	glm::mat4		fromWorld;
@@ -38,7 +46,6 @@ private:
 	Uint8				oldKeyState[SDL_NUM_SCANCODES];	// key state (keys[n] == true :-> pressed
 
 	void UpdateMouse();
-	void UpdateKeyboard();
 };
 
 #endif // __MOVEMENT_CONTROLLER__

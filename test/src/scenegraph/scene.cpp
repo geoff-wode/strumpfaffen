@@ -20,11 +20,20 @@ void Scene::LoadContent()
 
 void Scene::Update(unsigned int elapsedMS)
 {
-	if (movementController) { movementController->Update(elapsedMS); }
-	if (root) { root->UpdateNode(this, elapsedMS); }
+	if (movementController)
+	{
+		movementController->Update(elapsedMS);
+	}
+	if (root)
+	{
+		root->UpdateNode(this, elapsedMS);
+	}
 }
 
 void Scene::Render()
 {
-	if (root) { root->RenderNode(this); }
+	if (root)
+	{
+		root->RenderNode(this);
+	}
 }

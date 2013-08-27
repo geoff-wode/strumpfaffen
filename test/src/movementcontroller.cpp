@@ -24,6 +24,35 @@ MovementController::MovementController(SceneNodePtr object)
 }
 
 //-----------------------------------------------------------------
+void MovementController::OnKeyDown(SDL_Scancode key)
+{
+}
+//-----------------------------------------------------------------
+void MovementController::OnKeyUp(SDL_Scancode key)
+{
+}
+//-----------------------------------------------------------------
+void MovementController::OnMouseMove(const glm::ivec2& delta)
+{
+}
+//-----------------------------------------------------------------
+void MovementController::OnMouseLeftButtonDown(const glm::ivec2& pos)
+{
+}
+//-----------------------------------------------------------------
+void MovementController::OnMouseLeftButtonUp(const glm::ivec2& pos)
+{
+}
+//-----------------------------------------------------------------
+void MovementController::OnMouseRightButtonDown(const glm::ivec2& pos)
+{
+}
+//-----------------------------------------------------------------
+void MovementController::OnMouseRightButtonUp(const glm::ivec2& pos)
+{
+}
+
+//-----------------------------------------------------------------
 void MovementController::Update(unsigned int elapsedMS)
 {
 	UpdateMouse();
@@ -65,33 +94,30 @@ void MovementController::Update(unsigned int elapsedMS)
 
 void MovementController::UpdateMouse()
 {
-	glm::ivec2 mousePos;
-	const Uint32 buttons = SDL_GetMouseState(&mousePos.x, &mousePos.y);
+	glm::ivec2 newPos;
+	const Uint32 buttons = SDL_GetMouseState(&newPos.x, &newPos.y);
 
 	// If button is pressed start moving the controlled object...
-	if (MouseButtonDown(SDL_BUTTON_LEFT, buttons, oldMouseButtons))
+	if (MouseButtonDown(SDL_BUTTON_LEFT, oldMouseButtons, buttons))
 	{
 		leftMouseDown = true;
 		mousePosOnDown = mousePos;
 		yawOnDown = targetYaw;
 		pitchOnDown = targetPitch;
 	}
-	else if (MouseButtonHeld(SDL_BUTTON_LEFT, buttons, oldMouseButtons))
+	else if (MouseButtonHeld(SDL_BUTTON_LEFT, oldMouseButtons, buttons))
 	{
-		targetYaw = yawOnDown + (mousePosOnDown.x - mousePos.x);
-		targetPitch = pitchOnDown + (mousePos.y - mousePosOnDown.y);
+		const glm::ivec2 deltaPos(newPos - mousePos);
+		targetYaw = yawOnDown + (mousePosOnDown.x - deltaPos.x);
+		targetPitch = pitchOnDown + (deltaPos.y - mousePosOnDown.y);
 	}
-	else if (MouseButtonUp(SDL_BUTTON_LEFT, buttons, oldMouseButtons))
+	else if (MouseButtonUp(SDL_BUTTON_LEFT, oldMouseButtons, buttons))
 	{
 		leftMouseDown = false;
 	}
 
 	oldMouseButtons = buttons;
-}
-
-//-----------------------------------------------------------------
-void MovementController::UpdateKeyboard()
-{
+	mousePos = newPos;
 }
 
 //-----------------------------------------------------------------
@@ -115,15 +141,15 @@ static bool KeyUp(SDL_Scancode key, Uint8 oldState[], Uint8 newState[])
 
 static bool MouseButtonDown(Uint32 button, Uint32 oldState, Uint32 newState)
 {
-	return ((oldState & button) != button) && ((newState & button) == button);
+	return !(oldState & SDL_BUTTON(button)) && (newState & SDL_BUTTON(button));
 }
 
 static bool MouseButtonHeld(Uint32 button, Uint32 oldState, Uint32 newState)
 {
-	return ((oldState & button) == button) && ((newState & button) == button);
+	return (oldState & SDL_BUTTON(button)) && (newState & SDL_BUTTON(button));
 }
 
 static bool MouseButtonUp(Uint32 button, Uint32 oldState, Uint32 newState)
 {
-	return ((oldState & button) == button) && ((newState & button) != button);
+	return (oldState & SDL_BUTTON(button)) && !(newState & SDL_BUTTON(button));
 }

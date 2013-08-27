@@ -29,6 +29,12 @@ Device::Device()
 	glColorMask(renderState.colourMask.r, renderState.colourMask.g, renderState.colourMask.b, renderState.colourMask.a);
 	glDepthMask(renderState.depthMask);
 	glPolygonMode(GL_FRONT_AND_BACK, renderState.polygonMode);
+
+	glClearColor(0, 0, 0, 1);
+	glColorMask(true, true, true, true);
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
+	glFrontFace(GL_CW);
 }
 
 Device::~Device()

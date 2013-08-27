@@ -85,6 +85,7 @@ void TileNode::Render(Scene* const scene)
 	scene->renderState.indexBuffer = indexBuffer;
 	scene->renderState.vertexBuffer = vertexBuffer;
 	scene->renderState.vertexLayout = &vertexLayout;
+	scene->renderState.polygonMode = GL_LINE;
 
 	scene->device.Draw(GL_TRIANGLE_STRIP, 0, numElements, scene->renderState);
 }
