@@ -1,7 +1,7 @@
 // A single (flat) tile in XZ plane...
 
-#include "tile.h"
-#include "../device.h"
+#include <terrain/tile.h>
+#include <device.h>
 #include <vector>
 #include <glm/glm.hpp>
 #include <boost/shared_ptr.hpp>

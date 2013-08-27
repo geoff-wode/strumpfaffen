@@ -41,6 +41,8 @@
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(SolutionDir);$(ProjectDir)include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)lib\$(Configuration);$(LibraryPath)</LibraryPath>
+    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)intermediate\$(ProjectName)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -71,12 +73,6 @@ if exist $(SDL2_DIR)lib\$(PlatformShortName)\SDL2.dll (
 if exist $(FREEIMAGE_DIR)lib\$(PlatformShortName)\FreeImage.dll (
   echo Copying SDL2 runtime...
   xcopy $(FREEIMAGE_DIR)lib\$(PlatformShortName)\FreeImage.dll $(OutDir) /r/y
-  if errorlevel 1 goto OnFault
-)
-
-if exist $(ProjectDir)shaders\ (
-  echo Copying program shader files...
-  xcopy $(ProjectDir)shaders $(OutDir)shaders /s/i/r/y/c
   if errorlevel 1 goto OnFault
 )
 
@@ -121,29 +117,37 @@ echo Build post-step for $(ProjectName) complete.
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="device.cpp" />
-    <ClCompile Include="files.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="shader.cpp" />
-    <ClCompile Include="shadersemantic.cpp" />
-    <ClCompile Include="terrain\tile.cpp" />
+    <ClCompile Include="src\device.cpp" />
+    <ClCompile Include="src\files.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\scenegraph\cameranode.cpp" />
+    <ClCompile Include="src\scenegraph\matrixstack.cpp" />
+    <ClCompile Include="src\scenegraph\scene.cpp" />
+    <ClCompile Include="src\scenegraph\scenenode.cpp" />
+    <ClCompile Include="src\scenegraph\terrain\tilenode.cpp" />
+    <ClCompile Include="src\scenegraph\transformnode.cpp" />
+    <ClCompile Include="src\shader.cpp" />
+    <ClCompile Include="src\shadersemantic.cpp" />
+    <ClCompile Include="src\terrain\tile.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="buffers.h" />
-    <ClInclude Include="debug.h" />
-    <ClInclude Include="files.h" />
-    <ClInclude Include="device.h" />
-    <ClInclude Include="shader.h" />
-    <ClInclude Include="shadersemantic.h" />
-    <ClInclude Include="shaderuniformimpl.h" />
-    <ClInclude Include="renderstate.h" />
-    <ClInclude Include="terrain\tile.h" />
-    <ClInclude Include="vertexlayout.h" />
-    <ClInclude Include="vertexelement.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="shaders\simple\fs.glsl" />
-    <None Include="shaders\simple\vs.glsl" />
+    <ClInclude Include="include\buffers.h" />
+    <ClInclude Include="include\debug.h" />
+    <ClInclude Include="include\files.h" />
+    <ClInclude Include="include\device.h" />
+    <ClInclude Include="include\scenegraph\cameranode.h" />
+    <ClInclude Include="include\scenegraph\matrixstack.h" />
+    <ClInclude Include="include\scenegraph\scene.h" />
+    <ClInclude Include="include\scenegraph\scenenode.h" />
+    <ClInclude Include="include\scenegraph\terrain\tilenode.h" />
+    <ClInclude Include="include\scenegraph\transformnode.h" />
+    <ClInclude Include="include\shader.h" />
+    <ClInclude Include="include\shadersemantic.h" />
+    <ClInclude Include="include\shaderuniformimpl.h" />
+    <ClInclude Include="include\renderstate.h" />
+    <ClInclude Include="include\terrain\tile.h" />
+    <ClInclude Include="include\vertexlayout.h" />
+    <ClInclude Include="include\vertexelement.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

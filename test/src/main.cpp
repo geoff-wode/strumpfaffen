@@ -10,9 +10,9 @@
 #include <gl_loader/gl_loader.h>
 #include <SDL.h>
 
-#include "device.h"
-#include "shader.h"
-#include "terrain/tile.h"
+#include <device.h>
+#include <shader.h>
+#include <terrain/tile.h>
 
 //--------------------------------------------------------------------------------------------
 

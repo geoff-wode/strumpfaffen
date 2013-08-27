@@ -34,8 +34,11 @@ public:
 	// Configure the render state and draw.
 	void Draw(GLenum primitiveType, size_t start, size_t count, const RenderState& renderState);
 
+	const RenderState& CurrentRenderState() const;
+
 private:
 	RenderState		renderState;
+
 	UniformBuffer	uniformBuffer;
 	struct CommonShaderVarsBlock
 	{

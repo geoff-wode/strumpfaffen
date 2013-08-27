@@ -4,8 +4,8 @@
 #define __TILE__
 
 #include <stddef.h>
-#include "../device.h"
-#include "../shader.h"
+#include <device.h>
+#include <shader.h>
 
 class TerrainTile
 {

@@ -16,6 +16,10 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "temp", "temp\temp.vcxproj", "{1790D5FF-BE58-4E8F-85E3-6531BB477925}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test", "test\test.vcxproj", "{017E6E89-ACAC-4709-A685-D88FC991F664}"
+	ProjectSection(ProjectDependencies) = postProject
+		{851A4402-C191-4CBD-8288-E6882C56C565} = {851A4402-C191-4CBD-8288-E6882C56C565}
+		{3BB130CA-974E-4D88-8FEA-AB592FCB7486} = {3BB130CA-974E-4D88-8FEA-AB592FCB7486}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "002", "002\002.vcxproj", "{443730B3-67AF-4909-9DC7-52E62B883C95}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -40,6 +44,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "005", "005\005.vcxproj", "{
 	ProjectSection(ProjectDependencies) = postProject
 		{851A4402-C191-4CBD-8288-E6882C56C565} = {851A4402-C191-4CBD-8288-E6882C56C565}
 	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "shaders", "shaders\shaders.vcxproj", "{3BB130CA-974E-4D88-8FEA-AB592FCB7486}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -83,6 +89,10 @@ Global
 		{0CF7D402-2FD3-40B2-9DFA-47EBDD1C96E0}.Debug|Win32.Build.0 = Debug|Win32
 		{0CF7D402-2FD3-40B2-9DFA-47EBDD1C96E0}.Release|Win32.ActiveCfg = Release|Win32
 		{0CF7D402-2FD3-40B2-9DFA-47EBDD1C96E0}.Release|Win32.Build.0 = Release|Win32
+		{3BB130CA-974E-4D88-8FEA-AB592FCB7486}.Debug|Win32.ActiveCfg = Debug|Win32
+		{3BB130CA-974E-4D88-8FEA-AB592FCB7486}.Debug|Win32.Build.0 = Debug|Win32
+		{3BB130CA-974E-4D88-8FEA-AB592FCB7486}.Release|Win32.ActiveCfg = Release|Win32
+		{3BB130CA-974E-4D88-8FEA-AB592FCB7486}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
