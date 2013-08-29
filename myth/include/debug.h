@@ -4,15 +4,15 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-namespace staubflocken
+namespace debug
 {
-	extern FILE* debugLogFile;
+  extern FILE* logFile;
 }
 
 #define LOG(msg, ...) \
 	do \
 	{ \
-		fprintf(staubflocken::debugLogFile, msg, __VA_ARGS__); \
+		fprintf(debug::logFile, msg, __VA_ARGS__); \
 	} while (0)
 
 #define ASSERT(pred) ASSERTM(pred, "")

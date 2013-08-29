@@ -1,13 +1,11 @@
 #include <stdio.h>
 #include <dirent.h>
-#include <core/debug.h>
-#include <core/files.h>
-
-using namespace staubflocken;
+#include <files.h>
+#include <debug.h>
 
 //-----------------------------------------------------------------------
 
-bool file::Load(const std::string& filename, std::vector<char>& content)
+bool LoadFile(const std::string& filename, std::vector<char>& content)
 {
 	errno = 0;
 	FILE* in = fopen(filename.c_str(), "rb");
@@ -29,7 +27,7 @@ bool file::Load(const std::string& filename, std::vector<char>& content)
 
 //-----------------------------------------------------------------------
 
-bool file::ListFiles(const std::string& dirname, std::vector<std::string>& files)
+bool ListFiles(const std::string& dirname, std::vector<std::string>& files)
 {
 	const std::string path(dirname + "\\");
 
