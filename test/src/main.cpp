@@ -16,21 +16,24 @@
 #include <scenegraph/cameranode.h>
 #include <scenegraph/shadernode.h>
 #include <scenegraph/terrain/tilenode.h>
-#include <movementcontroller.h>
 #include <input/keyboard.h>
+#include <camera.h>
 
 //--------------------------------------------------------------------------------------------
 
 static void Init();
 static boost::shared_ptr<Scene> BuildScene(Device& device);
-static void PollEvents(Scene* const scene);
+static void PollEvents();
+
+//--------------------------------------------------------------------------------------------
+
+static const glm::ivec2 screenSize(800, 600);
 
 //--------------------------------------------------------------------------------------------
 
 FILE*	debugLogFile;
 static SDL_Window*		mainWindow;
 static SDL_GLContext	glContext;
-static bool						quit = false;
 
 //--------------------------------------------------------------------------------------------
 
@@ -39,32 +42,17 @@ int main(int argc, char* argv[])
 	Init();
 	Device device;
 
-	device.ProjectionMatrix = glm::perspective(45.0f, 800.0f/600.0f, 0.1f, 100.0f);
+	//device.ProjectionMatrix = glm::perspective(45.0f, 800.0f/600.0f, 0.1f, 100.0f);
 
 	boost::shared_ptr<Scene> scene = BuildScene(device);
 
-	boost::shared_ptr<CameraNode> camera(new CameraNode());
-	camera->SetTransform(glm::mat4(glm::translate(0,1,4)));
-	scene->root->children.push_back(camera);
-	
-	scene->movementController = boost::make_shared<MovementController>(camera);
-
 	scene->LoadContent();
-
-	unsigned int prevTime = 0;
 
 	do
 	{
-		PollEvents(scene.get());
+    PollEvents();
 
-		// Compute how much time has elapsed since the last frame...
-		const unsigned int now(SDL_GetTicks());
-		if (0 == prevTime) { prevTime = now; }
-		const unsigned int elapsedMS(now - prevTime);
-		prevTime = now;
-
-		// Update internal state...
-		scene->Update(elapsedMS);
+		scene->Update();
 
 		// TODO: The scene should be deciding when/how to clear any buffers...
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -74,7 +62,7 @@ int main(int argc, char* argv[])
 
 		// Flipping (is) marvellous...
 		SDL_GL_SwapWindow(mainWindow);
-	} while (!quit);
+	} while (!scene->HasQuit());
 
 	SDL_GL_DeleteContext(glContext);
 	SDL_DestroyWindow(mainWindow);
@@ -116,72 +104,6 @@ static void Init()
 }
 
 //--------------------------------------------------------------------------------------------
-static void PollEvents(Scene* const scene)
-{
-	SDL_Event event;
-	while (!quit && SDL_PollEvent(&event))
-	{
-		switch (event.type)
-		{
-		case SDL_QUIT: quit = true; break;
-		case SDL_KEYDOWN:
-			{
-				if (event.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
-				{
-					quit = true;
-				}
-				else
-				{
-					scene->movementController->OnKeyDown(event.key.keysym.scancode);
-				}
-			}
-			break;
-		case SDL_KEYUP:
-			{
-				scene->movementController->OnKeyUp(event.key.keysym.scancode);
-			}
-			break;
-		case SDL_MOUSEMOTION:
-			{
-				// A work-around due to sometimes getting an error-filled event after explicitly
-				// setting the mouse position...
-				static bool firstTime = true;
-				if (!firstTime)
-				{
-					scene->movementController->OnMouseMove(glm::ivec2(event.motion.xrel, event.motion.yrel));
-				}
-				else
-				{
-					firstTime = false;
-				}
-			}
-			break;
-		case SDL_MOUSEBUTTONDOWN:
-			{
-				switch (event.button.button)
-				{
-				case SDL_BUTTON_LEFT: scene->movementController->OnMouseLeftButtonDown(glm::ivec2(event.button.x, event.button.y)); break;
-				case SDL_BUTTON_RIGHT: scene->movementController->OnMouseRightButtonDown(glm::ivec2(event.button.x, event.button.y)); break;
-				default: break;
-				}
-			}
-			break;
-		case SDL_MOUSEBUTTONUP:
-			{
-				switch (event.button.button)
-				{
-				case SDL_BUTTON_LEFT: scene->movementController->OnMouseLeftButtonUp(glm::ivec2(event.button.x, event.button.y)); break;
-				case SDL_BUTTON_RIGHT: scene->movementController->OnMouseRightButtonUp(glm::ivec2(event.button.x, event.button.y)); break;
-				default: break;
-				}
-			}
-			break;
-		default: break;
-		}
-	}
-}
-
-//--------------------------------------------------------------------------------------------
 
 static boost::shared_ptr<Scene> BuildScene(Device& device)
 {
@@ -190,11 +112,23 @@ static boost::shared_ptr<Scene> BuildScene(Device& device)
 	scene->root = boost::make_shared<TransformNode>();
 
 	boost::shared_ptr<ShaderNode> shader(new ShaderNode("shaders/simple"));
-	boost::shared_ptr<TileNode> tile(new TileNode(5));
-
 	scene->root->children.push_back(shader);
 
+	boost::shared_ptr<TileNode> tile(new TileNode(5));
 	shader->children.push_back(tile);
 
 	return scene;
+}
+
+//--------------------------------------------------------------------------------------------
+static void PollEvents()
+{
+	SDL_Event event;
+	while (!quit && SDL_PollEvent(&event))
+	{
+		if (SDL_QUIT == event.type)
+		{
+  		quit = true;
+		}
+	}
 }

@@ -120,7 +120,6 @@ echo Build post-step for $(ProjectName) complete.
     <ClCompile Include="src\device.cpp" />
     <ClCompile Include="src\files.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\movementcontroller.cpp" />
     <ClCompile Include="src\scenegraph\cameranode.cpp" />
     <ClCompile Include="src\scenegraph\matrixstack.cpp" />
     <ClCompile Include="src\scenegraph\scene.cpp" />
@@ -130,7 +129,6 @@ echo Build post-step for $(ProjectName) complete.
     <ClCompile Include="src\scenegraph\transformnode.cpp" />
     <ClCompile Include="src\shader.cpp" />
     <ClCompile Include="src\shadersemantic.cpp" />
-    <ClCompile Include="src\terrain\tile.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\buffers.h" />
@@ -138,7 +136,11 @@ echo Build post-step for $(ProjectName) complete.
     <ClInclude Include="include\files.h" />
     <ClInclude Include="include\device.h" />
     <ClInclude Include="include\input\keyboard.h" />
-    <ClInclude Include="include\movementcontroller.h" />
+    <ClInclude Include="include\input\keyboardinterface.h" />
+    <ClInclude Include="include\input\mouse.h" />
+    <ClInclude Include="include\input\mouseinterface.h" />
+    <ClInclude Include="include\input\movementcontroller.h" />
+    <ClInclude Include="include\keyhandler.h" />
     <ClInclude Include="include\scenegraph\cameranode.h" />
     <ClInclude Include="include\scenegraph\matrixstack.h" />
     <ClInclude Include="include\scenegraph\scene.h" />
@@ -150,7 +152,6 @@ echo Build post-step for $(ProjectName) complete.
     <ClInclude Include="include\shadersemantic.h" />
     <ClInclude Include="include\shaderuniformimpl.h" />
     <ClInclude Include="include\renderstate.h" />
-    <ClInclude Include="include\terrain\tile.h" />
     <ClInclude Include="include\vertexlayout.h" />
     <ClInclude Include="include\vertexelement.h" />
   </ItemGroup>

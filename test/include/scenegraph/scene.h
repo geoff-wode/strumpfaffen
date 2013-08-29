@@ -2,9 +2,9 @@
 #define __SCENE__
 
 #include <device.h>
-#include <movementcontroller.h>
 #include <scenegraph/scenenode.h>
 #include <scenegraph/matrixstack.h>
+#include <scenegraph/cameranode.h>
 
 class Scene
 {
@@ -12,7 +12,8 @@ public:
 	SceneNodePtr	root;
 	MatrixStack		matrixStack;
 	Device&				device;
-	boost::shared_ptr<MovementController> movementController;
+
+  boost::shared_ptr<CameraNode> camera;
 
 	// The scene accumulates render state from each node as it traverses the graph.
 	// Nodes should modify the state in Render().
@@ -22,8 +23,15 @@ public:
 	virtual ~Scene();
 
 	void LoadContent();
-	void Update(unsigned int elapsedMS);
+	void Update();
 	void Render();
+
+  void Quit() { quit = true; }
+	bool HasQuit() { return quit; }
+
+private:
+	bool quit;
+	float prevTime;
 };
 
 #endif // __SCENE__

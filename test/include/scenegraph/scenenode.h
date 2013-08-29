@@ -22,7 +22,7 @@ public:
 
 	void LoadNodeContent(Scene* const scene);
 
-	void UpdateNode(Scene* const scene, unsigned int elapsedMS);
+	void UpdateNode(Scene* const scene, float elapsedMS);
 
 	void RenderNode(Scene* const scene);
 
@@ -36,7 +36,7 @@ private:
 	virtual void LoadContent(Scene* const scene) { }
 
 	// Implement this to modify the internal state of the node.
-	virtual void Update(Scene* const scene, unsigned int elapsedMS) { }
+	virtual void Update(Scene* const scene, float elapsedMS) { }
 
 	// Implememt this to perform actions just before rendering starts, e.g. visibility test.
 	// Return false to prevent this _and_all_subsequent_ nodes from being rendered.

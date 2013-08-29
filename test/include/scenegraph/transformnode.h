@@ -17,10 +17,10 @@ public:
 	// Restores the WorldMatrix shader value to its value before this node was rendered.
 	virtual void PostRender(Scene* const scene);
 
-	virtual void SetTransform(glm::mat4& toWorld);
-	virtual void SetTransform(glm::mat4& toWorld, glm::mat4& fromWorld);
+	virtual void SetTransform(const glm::mat4& toWorld);
+	virtual void SetTransform(const glm::mat4& toWorld, const glm::mat4& fromWorld);
 
-private:
+protected:
 	glm::mat4 toWorld;
 	glm::mat4 fromWorld;
 };
