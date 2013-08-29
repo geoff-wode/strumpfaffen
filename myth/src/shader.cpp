@@ -2,13 +2,10 @@
 #include <files.h>
 #include <debug.h>
 #include <vector>
-
-//--------------------------------------------------
-
-static std::vector<GLuint> Compile(const std::vector<std::string>& shaderNames);
-static GLuint CompileShader(const char* const code, int codeLength, GLenum type);
-static bool LinkProgram(const std::vector<GLuint> shaders, GLuint programHandle);
-static void QueryShaderAttributes(GLuint program);
+#include <memory>
+#include <map>
+#include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
 
 //--------------------------------------------------
 
@@ -37,6 +34,26 @@ static const char CommonShaderCode[] =
 
 //--------------------------------------------------
 
+struct ShaderUniform
+{
+  ShaderUniform() : modified(false) { }
+  GLenum type;
+  GLuint location;
+  bool modified;
+  double cache[16];
+};
+typedef std::map<std::string, ShaderUniform> ShaderUniformMap;
+
+//--------------------------------------------------
+
+static std::vector<GLuint> Compile(const std::vector<std::string>& shaderNames);
+static GLuint CompileShader(const char* const code, int codeLength, GLenum type);
+static bool LinkProgram(const std::vector<GLuint> shaders, GLuint programHandle);
+static void QueryShaderAttributes(GLuint program);
+static void QueryShaderUniforms(GLuint program, ShaderUniformMap& uniforms);
+
+//--------------------------------------------------
+
 Shader::Shader(const std::string& name)
   : programHandle(glCreateProgram())
 {
@@ -48,6 +65,7 @@ Shader::Shader(const std::string& name)
   {
     LOG(" - built ok\n");
     QueryShaderAttributes(programHandle);
+    QueryShaderUniforms(programHandle, uniforms);
   }
 }
 
@@ -61,6 +79,26 @@ Shader::~Shader()
 void Shader::Use()
 {
   glUseProgram(programHandle);
+
+  for (ShaderUniformMap::iterator it = uniforms.begin(); it != uniforms.end(); ++it)
+  {
+    if (it->second.modified)
+    {
+			switch (it->second.type)
+			{
+      case GL_INT:         glUniform1i(it->second.location, *(GLint*)it->second.cache); break;
+      case GL_UNSIGNED_INT:glUniform1ui(it->second.location, *(GLuint*)it->second.cache); break;
+			case GL_FLOAT:		  glUniform1f(it->second.location, *(float*)it->second.cache); break;
+			case GL_FLOAT_VEC2: glUniform2fv(it->second.location, 1, (float*)it->second.cache); break;
+			case GL_FLOAT_VEC3: glUniform3fv(it->second.location, 1, (float*)it->second.cache); break;
+			case GL_FLOAT_VEC4: glUniform4fv(it->second.location, 1, (float*)it->second.cache); break;
+			case GL_FLOAT_MAT2: glUniformMatrix2fv(it->second.location, 1, GL_FALSE, (float*)it->second.cache); break;
+			case GL_FLOAT_MAT3: glUniformMatrix3fv(it->second.location, 1, GL_FALSE, (float*)it->second.cache); break;
+			case GL_FLOAT_MAT4: glUniformMatrix4fv(it->second.location, 1, GL_FALSE, (float*)it->second.cache); break;
+			}
+      it->second.modified = false;
+    }
+  }
 }
 
 //--------------------------------------------------
@@ -69,6 +107,31 @@ GLint Shader::GetAttributeIndex(const std::string& name)
 {
   return glGetAttribLocation(programHandle, name.c_str());
 }
+
+//--------------------------------------------------
+
+void Shader::SetUniform(const std::string& name, const void* const data, size_t size)
+{
+  ShaderUniformMap::iterator it = uniforms.find(name);
+  if (uniforms.end() != it)
+  {
+    if (0 != std::memcmp(it->second.cache, data, size))
+    {
+      std::memcpy(it->second.cache, data, size);
+      it->second.modified = true;
+    }
+  }
+}
+
+void Shader::SetUniform(const std::string& name, int value) { SetUniform(name, &value, sizeof(value)); }
+void Shader::SetUniform(const std::string& name, unsigned int value) { SetUniform(name, &value, sizeof(value)); }
+void Shader::SetUniform(const std::string& name, float value) { SetUniform(name, &value, sizeof(value)); }
+void Shader::SetUniform(const std::string& name, const glm::vec2& value) { SetUniform(name, &value, sizeof(value)); }
+void Shader::SetUniform(const std::string& name, const glm::vec3& value) { SetUniform(name, &value, sizeof(value)); }
+void Shader::SetUniform(const std::string& name, const glm::vec4& value) { SetUniform(name, &value, sizeof(value)); }
+void Shader::SetUniform(const std::string& name, const glm::mat2& value) { SetUniform(name, &value, sizeof(value)); }
+void Shader::SetUniform(const std::string& name, const glm::mat3& value) { SetUniform(name, &value, sizeof(value)); }
+void Shader::SetUniform(const std::string& name, const glm::mat4& value) { SetUniform(name, &value, sizeof(value)); }
 
 //--------------------------------------------------
 
@@ -153,6 +216,7 @@ static void QueryShaderAttributes(GLuint program)
 {
 	GLint numAttributes;
 	glGetProgramiv(program, GL_ACTIVE_ATTRIBUTES, &numAttributes);
+  LOG("  has %d attributes\n", numAttributes);
 
 	for (GLint i = 0; i < numAttributes; ++i)
 	{
@@ -160,6 +224,40 @@ static void QueryShaderAttributes(GLuint program)
 		GLint numUnits;
 		GLenum type;
 		glGetActiveAttrib(program, i, sizeof(attrName)-1, NULL, &numUnits, &type, attrName);
-		LOG("  %s\n", attrName);
+		LOG("    %s\n", attrName);
+	}
+}
+
+//--------------------------------------------------
+static void QueryShaderUniforms(GLuint program, ShaderUniformMap& uniforms)
+{
+	GLint numUniforms;
+	glGetProgramiv(program, GL_ACTIVE_UNIFORMS, &numUniforms);
+  LOG("  has %d uniforms\n", numUniforms);
+
+	std::vector<GLuint> indices(numUniforms);
+	for (GLint i = 0; i < numUniforms; ++i) { indices[i] = i; }
+
+	std::vector<GLint> types(numUniforms);
+	glGetActiveUniformsiv(program, numUniforms, indices.data(), GL_UNIFORM_TYPE, types.data());
+
+	std::vector<GLint> blockIndices(numUniforms);
+	glGetActiveUniformsiv(program, numUniforms, indices.data(), GL_UNIFORM_BLOCK_INDEX, blockIndices.data());
+
+	char uniformName[256] = { 0 };
+
+	for (int i = 0; i < numUniforms; ++i)
+	{
+		// not a named uniform block...
+		glGetActiveUniformName(program, i, sizeof(uniformName)-1, NULL, uniformName);
+    LOG("    %s\n", uniformName);
+
+		if (-1 == blockIndices[i])
+		{
+      ShaderUniform u;
+      u.type = types[i];
+      u.location = glGetUniformLocation(program, uniformName);
+			uniforms[uniformName] = u;
+		}
 	}
 }

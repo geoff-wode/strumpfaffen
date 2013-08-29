@@ -14,16 +14,20 @@
     <ClCompile Include="src\files.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\shader.cpp" />
+    <ClCompile Include="src\texture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\buffers.h" />
     <ClInclude Include="include\debug.h" />
     <ClInclude Include="include\files.h" />
     <ClInclude Include="include\shader.h" />
+    <ClInclude Include="include\texture.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\simplest\fs.glsl" />
     <None Include="shaders\simplest\vs.glsl" />
+    <None Include="shaders\textured\fs.glsl" />
+    <None Include="shaders\textured\vs.glsl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{785DD223-1863-46CD-951E-9E687F053A85}</ProjectGuid>

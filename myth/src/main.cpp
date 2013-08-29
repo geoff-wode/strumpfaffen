@@ -1,4 +1,5 @@
 #include <SDL.h>
+#include <SOIL.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
@@ -10,6 +11,7 @@
 #include <debug.h>
 #include <shader.h>
 #include <buffers.h>
+#include <texture.h>
 
 //-----------------------------------------------------
 
@@ -19,7 +21,9 @@ static SDL_GLContext glContext;
 
 static GLuint vao;
 static boost::shared_ptr<VertexBuffer>  vertexBuffer;
-boost::shared_ptr<Shader> shader;
+static boost::shared_ptr<Shader> shader;
+static boost::shared_ptr<Texture> texture;
+static boost::shared_ptr<Sampler> sampler;
 
 //-----------------------------------------------------
 
@@ -33,7 +37,15 @@ int main(int argc, char* argv[])
 {
   Init("Myth", 1280, 720, false);
 
-  shader = boost::make_shared<Shader>("shaders/simplest");
+  shader = boost::make_shared<Shader>("shaders/textured");
+  shader->SetUniform("sampler", 0);
+
+  texture = boost::make_shared<Texture>();
+  texture->Load("images/hazard.png");
+
+  sampler = boost::make_shared<Sampler>(0);
+  sampler->SetTexture(texture);
+
   CreateTriangle();
 
   bool quit = false;
@@ -112,11 +124,15 @@ static void Init(const std::string& title, int width, int height, bool fullScree
 //-----------------------------------------------------
 static void CreateTriangle()
 {
-  static const glm::vec3 vertices[] =
+  static struct Vertex
   {
-    glm::vec3(-0.75f, -0.75f, 0.0f),
-    glm::vec3( 0.75f, -0.75f, 0.0f),
-    glm::vec3( 0.0f,   0.75f, 0.0f),
+    glm::vec3 position;
+    glm::vec2 textureCoord;
+  } vertices[] =
+  {
+    { glm::vec3(-0.75f, -0.75f, 0.0f), glm::vec2(0.0f, 0.0f) },
+    { glm::vec3( 0.75f, -0.75f, 0.0f), glm::vec2(1.0f, 0.0f) },
+    { glm::vec3( 0.0f,   0.75f, 0.0f), glm::vec2(0.5f, 1.0f) }
   };
 
   glGenVertexArrays(1, &vao);
@@ -126,9 +142,11 @@ static void CreateTriangle()
   vertexBuffer->SetData(vertices, sizeof(vertices), 0);
   vertexBuffer->Enable();
 
-  const GLint attribIndex = shader->GetAttributeIndex("Position");
-  glEnableVertexAttribArray(attribIndex);
-  glVertexAttribPointer(attribIndex, 3, GL_FLOAT, GL_FALSE, 0, (const void*)0);
+  glEnableVertexAttribArray(shader->GetAttributeIndex("Position"));
+  glVertexAttribPointer(shader->GetAttributeIndex("Position"), 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(Vertex, position));
+
+  glEnableVertexAttribArray(shader->GetAttributeIndex("TextureCoord"));
+  glVertexAttribPointer(shader->GetAttributeIndex("TextureCoord"), 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(Vertex, textureCoord));
 
   VertexBuffer::Disable();
   glBindVertexArray(0);
@@ -140,8 +158,13 @@ static void Render()
   glClear(GL_COLOR_BUFFER_BIT);
 
   shader->Use();
+  sampler->Use();
+
   glBindVertexArray(vao);
+
   glDrawArrays(GL_TRIANGLES, 0, 3);
+  
+  glBindTexture(GL_TEXTURE_2D, 0);
   glBindVertexArray(0);
   glUseProgram(0);
 
