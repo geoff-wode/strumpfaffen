@@ -12,6 +12,7 @@
 #include <shader.h>
 #include <buffers.h>
 #include <texture.h>
+#include <sampler.h>
 
 //-----------------------------------------------------
 
@@ -22,8 +23,8 @@ static SDL_GLContext glContext;
 static GLuint vao;
 static boost::shared_ptr<VertexBuffer>  vertexBuffer;
 static boost::shared_ptr<Shader> shader;
-static boost::shared_ptr<Texture> texture;
-static boost::shared_ptr<Sampler> sampler;
+static boost::shared_ptr<Texture2D> texture[2];
+static boost::shared_ptr<Sampler2D> sampler;
 
 //-----------------------------------------------------
 
@@ -40,15 +41,17 @@ int main(int argc, char* argv[])
   shader = boost::make_shared<Shader>("shaders/textured");
   shader->SetUniform("sampler", 0);
 
-  texture = boost::make_shared<Texture>();
-  texture->Load("images/hazard.png");
+  texture[0] = boost::make_shared<Texture2D>("images/hazard.png");
+  texture[0]->Load();
+  texture[1] = boost::make_shared<Texture2D>("images/Untitled.png");
+  texture[1]->Load();
 
-  sampler = boost::make_shared<Sampler>(0);
-  sampler->SetTexture(texture);
+  sampler = boost::make_shared<Sampler2D>(0);
 
   CreateTriangle();
 
   bool quit = false;
+  size_t selectedTexture = 0;
 
   while (!quit)
   {
@@ -59,10 +62,19 @@ int main(int argc, char* argv[])
         switch (event.type)
         {
         case SDL_QUIT: quit = true; break;
+        case SDL_KEYDOWN:
+          {
+            if (event.key.keysym.scancode == SDL_SCANCODE_SPACE)
+            {
+              selectedTexture ^= 1;
+            }
+          }
+          break;
         default: break;
         }
       }
     }
+    sampler->SetTexture(texture[selectedTexture]);
     Render();
   }
 
@@ -103,11 +115,19 @@ static void Init(const std::string& title, int width, int height, bool fullScree
 
   if (fullScreen)
   {
-    mainWindow = SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 0, 0, SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP);
+    mainWindow = SDL_CreateWindow(
+      title.c_str(),
+      SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+      0, 0, // width & height are ignored in full screen mode
+      SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP);
   }
   else
   {
-    mainWindow = SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_OPENGL);
+    mainWindow = SDL_CreateWindow(
+      title.c_str(),
+      SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+      width, height,
+      SDL_WINDOW_OPENGL);
   }
 
 	glContext = SDL_GL_CreateContext(mainWindow);
@@ -158,13 +178,13 @@ static void Render()
   glClear(GL_COLOR_BUFFER_BIT);
 
   shader->Use();
-  sampler->Use();
+  sampler->Activate();
 
   glBindVertexArray(vao);
 
   glDrawArrays(GL_TRIANGLES, 0, 3);
   
-  glBindTexture(GL_TEXTURE_2D, 0);
+  Texture2D::Deactivate();
   glBindVertexArray(0);
   glUseProgram(0);
 

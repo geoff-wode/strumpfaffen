@@ -13,6 +13,7 @@
   <ItemGroup>
     <ClCompile Include="src\files.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\sampler.cpp" />
     <ClCompile Include="src\shader.cpp" />
     <ClCompile Include="src\texture.cpp" />
   </ItemGroup>
@@ -20,6 +21,7 @@
     <ClInclude Include="include\buffers.h" />
     <ClInclude Include="include\debug.h" />
     <ClInclude Include="include\files.h" />
+    <ClInclude Include="include\sampler.h" />
     <ClInclude Include="include\shader.h" />
     <ClInclude Include="include\texture.h" />
   </ItemGroup>

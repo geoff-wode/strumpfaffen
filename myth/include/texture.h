@@ -2,51 +2,27 @@
 #define __TEXTURE__
 
 #include <string>
-#include <gl_loader/gl_loader.h>
-#include <boost/shared_ptr.hpp>
 
-class Texture
+class Texture2D
 {
 public:
-  Texture() { }
-  ~Texture();
+  Texture2D(const std::string& name);
+  ~Texture2D();
 
-  bool Load(const std::string& name);
+  // Loads the image named in the constructor into GPU memory.
+  bool Load();
 
-private:
-  unsigned int handle;
-  friend class Sampler;
-};
+  size_t GetWidth() const { return width; }
+  size_t GetHeight() const { return height; }
 
-class Sampler
-{
-public:
-  Sampler(unsigned int slot) : slot(slot)
-  {
-    glGenSamplers(1, &handle);
-  }
-  ~Sampler()
-  {
-    glDeleteSamplers(1, &handle);
-  }
-
-  void SetMagFilter(GLenum value) { glSamplerParameteri(handle, GL_TEXTURE_MAG_FILTER, value); }
-  void SetMinFilter(GLenum value) { glSamplerParameteri(handle, GL_TEXTURE_MIN_FILTER, value); }
-  void SetWrapS(GLenum value) { glSamplerParameteri(handle, GL_TEXTURE_WRAP_S, value); }
-  void SetWrapT(GLenum value) { glSamplerParameteri(handle, GL_TEXTURE_WRAP_T, value); }
-  void SetTexture(boost::shared_ptr<Texture> texture) { this->texture = texture; }
-
-  void Use()
-  {
-    glActiveTexture(GL_TEXTURE0 + slot);
-    glBindTexture(GL_TEXTURE_2D, texture->handle);
-    glBindSampler(GL_TEXTURE0 + slot, handle);
-  }
+  void Activate() const;
+  static void Deactivate();
 
 private:
-  unsigned int slot;
+  const std::string name;
   unsigned int handle;
-  boost::shared_ptr<Texture> texture;
+  size_t width;
+  size_t height;
 };
 
 #endif // __TEXTURE__
