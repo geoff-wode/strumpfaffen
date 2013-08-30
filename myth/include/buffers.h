@@ -19,9 +19,7 @@ public:
 
 	void SetData(const void* const data, size_t size, size_t offset)
 	{
-		Enable();
 		glBufferSubData(type, offset, size, data);
-		glBindBuffer(type, 0);
 	}
 
 protected:
@@ -31,6 +29,7 @@ protected:
 		glGenBuffers(1, &handle);
 		glBindBuffer(type, handle);
 		glBufferData(type, size, NULL, usage);
+    glBindBuffer(type, 0);
 	}
 
 	GLuint handle;

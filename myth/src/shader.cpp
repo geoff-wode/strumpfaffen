@@ -17,7 +17,7 @@ static const char CommonShaderCode[] =
 	"#define TWO_PI (PI * 2)\n"
 	"#define PI_OVER_2 (PI * 0.5f)\n"
 	"\n"
-	"layout (std140) uniform CommonShaderVarsBlock\n"
+	"layout (std140) uniform GlobalUniforms\n"
 	"{\n"
 	"	vec4 CameraPos;\n"
 	" mat4 WorldMatrix;\n"
@@ -250,7 +250,6 @@ static void QueryShaderUniforms(GLuint program, ShaderUniformMap& uniforms)
 	{
 		// not a named uniform block...
 		glGetActiveUniformName(program, i, sizeof(uniformName)-1, NULL, uniformName);
-    LOG("    %s\n", uniformName);
 
 		if (-1 == blockIndices[i])
 		{
@@ -258,6 +257,19 @@ static void QueryShaderUniforms(GLuint program, ShaderUniformMap& uniforms)
       u.type = types[i];
       u.location = glGetUniformLocation(program, uniformName);
 			uniforms[uniformName] = u;
+      LOG("    %s\n", uniformName);
 		}
+    else
+    {
+      char blockName[128] = { 0 };
+      glGetActiveUniformBlockName(program, blockIndices[i], sizeof(blockName)-1, NULL, blockName);
+      LOG("    %s::%s\n", blockName, uniformName);
+    }
 	}
+
+	const GLuint uniformBlockIndex = glGetUniformBlockIndex(program, "GlobalUniforms");
+	if (GL_INVALID_INDEX != uniformBlockIndex)
+  {
+		glUniformBlockBinding(program, uniformBlockIndex, 0);
+  }
 }
