@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\camera.cpp" />
     <ClCompile Include="src\files.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\sampler.cpp" />
@@ -19,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\buffers.h" />
+    <ClInclude Include="include\camera.h" />
     <ClInclude Include="include\debug.h" />
     <ClInclude Include="include\files.h" />
     <ClInclude Include="include\sampler.h" />

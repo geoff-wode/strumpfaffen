@@ -15,6 +15,7 @@
 #include <buffers.h>
 #include <texture.h>
 #include <sampler.h>
+#include <camera.h>
 
 //-----------------------------------------------------
 
@@ -49,11 +50,13 @@ static GlobalUniforms                   globalUniforms;
 static GLuint vao;
 static boost::shared_ptr<VertexBuffer>  vertexBuffer;
 
+static boost::shared_ptr<Camera> camera;
 static boost::shared_ptr<Shader> shader;
 static boost::shared_ptr<Texture2D> texture;
 static boost::shared_ptr<Sampler2D> sampler;
 
 static float rotation = 0.0f;
+static glm::ivec2 oldMousePos;
 
 //-----------------------------------------------------
 
@@ -67,15 +70,12 @@ static void Render();
 int main(int argc, char* argv[])
 {
   Init("Myth", 1280, 720, false);
+  
+  uniformBuffer = boost::make_shared<UniformBuffer>(sizeof(GlobalUniforms), 0);
 
   const float aspectRatio((float)1280/(float)720);
-  
-  globalUniforms.ViewMatrix = glm::lookAt(glm::vec3(3,3,3), glm::vec3(0), glm::vec3(0,1,0));
-  globalUniforms.InverseViewMatrix = glm::inverse(globalUniforms.ViewMatrix);
-  globalUniforms.ProjectionMatrix = glm::perspective(45.0f, aspectRatio, 0.1f, 100.0f);
-  globalUniforms.ViewProjectionMatrix = globalUniforms.ProjectionMatrix * globalUniforms.ViewMatrix;
-
-  uniformBuffer = boost::make_shared<UniformBuffer>(sizeof(GlobalUniforms), 0);
+  camera = boost::make_shared<Camera>(45.0f, aspectRatio, 0.1f, 100.0f);
+  camera->Position = glm::vec3(0,2,4);
 
   shader = boost::make_shared<Shader>("shaders/textured");
   shader->SetUniform("sampler", 0);
@@ -183,6 +183,9 @@ static void Init(const std::string& title, int width, int height, bool fullScree
   glClearDepth(1.0);
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LESS);
+
+  SDL_GetMouseState(&oldMousePos.x, &oldMousePos.y);
+  SDL_SetRelativeMouseMode(SDL_TRUE);
 }
 
 //-----------------------------------------------------
@@ -259,14 +262,56 @@ static void CreateObject()
 //-----------------------------------------------------
 static void Update(unsigned int elapsedMS)
 {
-  const float elaspedSeconds = (float)elapsedMS / 1000.0f;
-  const float rotationsPerSecond = 180.0f;
-  rotation += rotationsPerSecond * elaspedSeconds;
-  if (rotation > 360.0f) { rotation -= 360.0f; }
+  const float elapsedSeconds = (float)elapsedMS / 1000.0f;
 
-  globalUniforms.WorldMatrix = glm::rotate(glm::mat4(1), rotation, glm::vec3(0,1,0));
-  globalUniforms.WorldViewMatrix = globalUniforms.ViewMatrix * globalUniforms.WorldMatrix;
-  globalUniforms.WorldViewProjectionMatrix = globalUniforms.ViewProjectionMatrix * globalUniforms.WorldMatrix;
+  // keyboard input...
+  {
+    const float unitsPerSecond = 2.0f;
+    const Uint8* pressedKeys = SDL_GetKeyboardState(NULL);
+    if (pressedKeys[SDL_SCANCODE_W]) { camera->Position += (camera->Forward * unitsPerSecond * elapsedSeconds); }
+    if (pressedKeys[SDL_SCANCODE_S]) { camera->Position += (-camera->Forward * unitsPerSecond * elapsedSeconds); }
+    if (pressedKeys[SDL_SCANCODE_A]) { camera->Position += (-camera->Right * unitsPerSecond * elapsedSeconds); }
+    if (pressedKeys[SDL_SCANCODE_D]) { camera->Position += (camera->Right * unitsPerSecond * elapsedSeconds); }
+    if (pressedKeys[SDL_SCANCODE_X]) { camera->Position += (glm::vec3(0,1,0) * unitsPerSecond * elapsedSeconds); }
+    if (pressedKeys[SDL_SCANCODE_Z]) { camera->Position += (glm::vec3(0,-1,0) * unitsPerSecond * elapsedSeconds); }
+    if (pressedKeys[SDL_SCANCODE_LEFT]) { camera->Yaw -= 0.1f; }
+    if (pressedKeys[SDL_SCANCODE_RIGHT]) { camera->Yaw += 0.1f; }
+    if (pressedKeys[SDL_SCANCODE_UP]) { camera->Pitch -= 0.1f; }
+    if (pressedKeys[SDL_SCANCODE_DOWN]) { camera->Pitch += 0.1f; }
+  }
+
+  // mouse input...
+  {
+    const float sensitivity = 0.1f;
+    glm::ivec2 position;
+    const Uint32 buttons = SDL_GetRelativeMouseState(&position.x, &position.y);
+    camera->Yaw += (sensitivity * (float)position.x);
+    camera->Pitch += (sensitivity * (float)position.y);
+  }
+
+  // update the camera and set the various shader uniforms accordingly...
+  {
+    camera->Update();
+    globalUniforms.CameraPos = glm::vec4(camera->Position, 1);
+    globalUniforms.ViewMatrix = camera->ViewMatrix;
+    globalUniforms.ProjectionMatrix = camera->PerspectiveMatrix;
+  }
+
+  // update the object(s)...
+  {
+    const float rotationsPerSecond = 90.0f;
+    rotation += rotationsPerSecond * elapsedSeconds;
+    if (rotation > 360.0f) { rotation -= 360.0f; }
+    globalUniforms.WorldMatrix = glm::rotate(glm::mat4(1), rotation, glm::vec3(0,1,0));
+  }
+
+  // compute "automatic" shader uniforms...
+  {
+    globalUniforms.InverseViewMatrix = glm::inverse(globalUniforms.ViewMatrix);
+    globalUniforms.WorldViewMatrix = globalUniforms.ViewMatrix * globalUniforms.WorldMatrix;
+    globalUniforms.ViewProjectionMatrix = globalUniforms.ProjectionMatrix * globalUniforms.ViewMatrix;
+    globalUniforms.WorldViewProjectionMatrix = globalUniforms.ViewProjectionMatrix * globalUniforms.WorldMatrix;
+  }
 }
 
 //-----------------------------------------------------
