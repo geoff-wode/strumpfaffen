@@ -79,7 +79,10 @@ Shader::~Shader()
 void Shader::Use()
 {
   glUseProgram(programHandle);
+}
 
+void Shader::ApplyUniforms()
+{
   for (ShaderUniformMap::iterator it = uniforms.begin(); it != uniforms.end(); ++it)
   {
     if (it->second.modified)

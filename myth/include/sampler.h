@@ -1,28 +1,53 @@
 #if ! defined(__SAMPLER__)
 #define __SAMPLER__
 
-#include <texture.h>
 #include <boost/shared_ptr.hpp>
+#include <gl_loader/gl_loader.h>
 
-class Sampler2D
+struct Sampler2D
 {
-public:
-  Sampler2D(unsigned int slot);
-  ~Sampler2D();
+  Sampler2D()
+    : handle(0),
+      minFilter(GL_LINEAR_MIPMAP_LINEAR), magFilter(GL_LINEAR),
+      wrapS(GL_REPEAT),
+      wrapT(GL_REPEAT),
+      maxAnisotropy(1.0f)
+  {
+    glGenSamplers(1, (GLuint*)&handle);
+    glSamplerParameteri(handle, GL_TEXTURE_MAG_FILTER, magFilter);
+    glSamplerParameteri(handle, GL_TEXTURE_MIN_FILTER, minFilter);
+    glSamplerParameteri(handle, GL_TEXTURE_WRAP_S, wrapS);
+    glSamplerParameteri(handle, GL_TEXTURE_WRAP_T, wrapT);
+    glSamplerParameterf(handle, GL_TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy);
+  }
 
-  void SetMagFilter(GLenum value);
-  void SetMinFilter(GLenum value);
-  void SetWrapS(GLenum value);
-  void SetWrapT(GLenum value);
-  void SetTexture(boost::shared_ptr<Texture2D> texture);
+  Sampler2D(GLenum minFilter, GLenum magFilter, GLenum wrapS, GLenum wrapT, float maxAnisotropy = 1.0f)
+    : handle(0),
+      minFilter(minFilter), magFilter(magFilter),
+      wrapS(wrapS),
+      wrapT(wrapT),
+      maxAnisotropy(maxAnisotropy)
+  {
+    glGenSamplers(1, (GLuint*)&handle);
+    glSamplerParameteri(handle, GL_TEXTURE_MAG_FILTER, magFilter);
+    glSamplerParameteri(handle, GL_TEXTURE_MIN_FILTER, minFilter);
+    glSamplerParameteri(handle, GL_TEXTURE_WRAP_S, wrapS);
+    glSamplerParameteri(handle, GL_TEXTURE_WRAP_T, wrapT);
+    glSamplerParameterf(handle, GL_TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy);
+  }
 
-  void Activate();
-  void Deactivate();
+  ~Sampler2D() { glDeleteSamplers(1, &handle);  }
 
-private:
-  unsigned int handle;
-  unsigned int slot;
-  boost::shared_ptr<Texture2D> texture;
+  void Bind(unsigned int textureUnit) { glBindSampler(GL_TEXTURE0 + textureUnit, handle); }
+  static void Unbind(unsigned int textureUnit) { glBindSampler(GL_TEXTURE0 + textureUnit, 0); }
+
+  const GLuint handle;
+  const GLenum minFilter;
+  const GLenum magFilter;
+  const GLenum wrapS;
+  const GLenum wrapT;
+  const float maxAnisotropy;
 };
+
 
 #endif // __SAMPLER__

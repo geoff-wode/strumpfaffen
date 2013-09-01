@@ -16,6 +16,7 @@ public:
   ~Shader();
 
   void Use();
+  void ApplyUniforms();
 
   // Return the index for attribute 'name' in the shader.
   GLint GetAttributeIndex(const std::string& name);

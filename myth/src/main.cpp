@@ -3,19 +3,24 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
+#include <list>
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <gl_loader/gl_loader.h>
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
+#include <boost/foreach.hpp>
 
 #include <debug.h>
 #include <shader.h>
 #include <buffers.h>
 #include <texture.h>
-#include <sampler.h>
 #include <camera.h>
+#include <sampler.h>
+#include <textureunit.h>
+#include <renderstate.h>
+#include <clearstate.h>
 
 //-----------------------------------------------------
 
@@ -38,32 +43,64 @@ struct GlobalUniforms
   glm::mat4 WorldViewProjectionMatrix;
 };
 
+struct ModelAsset
+{
+  GLuint vao;
+  GLenum drawType;
+  GLint drawFirstVertex;
+  GLint drawVertexCount;
+  boost::shared_ptr<Shader> shader;
+  boost::shared_ptr<Sampler2D> sampler;
+  boost::shared_ptr<Texture2D> texture;
+  boost::shared_ptr<VertexBuffer> vertexBuffer;
+};
+
+struct ModelInstance
+{
+  glm::mat4 transform;
+  boost::shared_ptr<ModelAsset> asset;
+};
+
+// Maintains the moment-by-moment of the OpenGL context.
+// This is used to prevent redundant calls to change state.
+struct Device
+{
+  ClearState clearState;
+  RenderState renderState;
+};
+
 //-----------------------------------------------------
 
 FILE* debug::logFile;
 static SDL_Window* mainWindow;
 static SDL_GLContext glContext;
 
+static Device device;
+
 static boost::shared_ptr<UniformBuffer> uniformBuffer;
 static GlobalUniforms                   globalUniforms;
 
-static GLuint vao;
-static boost::shared_ptr<VertexBuffer>  vertexBuffer;
+static boost::shared_ptr<ModelAsset> woodenCrate;
+static std::list<boost::shared_ptr<ModelInstance>> instances;
 
 static boost::shared_ptr<Camera> camera;
-static boost::shared_ptr<Shader> shader;
-static boost::shared_ptr<Texture2D> texture;
-static boost::shared_ptr<Sampler2D> sampler;
 
 static float rotation = 0.0f;
-static glm::ivec2 oldMousePos;
 
 //-----------------------------------------------------
 
 static void Init(const std::string& title, int width, int height, bool fullScreen);
 static void CreateObject();
+static void CreateInstances();
 static void Update(unsigned int elapsedMS);
 static void Render();
+static void ApplyShader(boost::shared_ptr<Shader> shader, RenderState& state);
+static void ApplyTextureUnits(boost::shared_ptr<Sampler2D> samplers[], RenderState& state);
+static void ForceClearState(const ClearState& state);
+static void ForceRenderState(const RenderState& state);
+static void ApplyShader(boost::shared_ptr<Shader> shader, RenderState& state);
+static void ApplyTextureUnits(TextureUnit updated[], TextureUnit current[]);
+static void ApplyVAO(GLuint updated, RenderState& state);
 
 //-----------------------------------------------------
 
@@ -75,18 +112,10 @@ int main(int argc, char* argv[])
 
   const float aspectRatio((float)1280/(float)720);
   camera = boost::make_shared<Camera>(45.0f, aspectRatio, 0.1f, 100.0f);
-  camera->Position = glm::vec3(0,2,4);
-
-  shader = boost::make_shared<Shader>("shaders/textured");
-  shader->SetUniform("sampler", 0);
-
-  texture = boost::make_shared<Texture2D>("images/wooden-crate.jpg");
-  texture->Load();
-
-  sampler = boost::make_shared<Sampler2D>(0);
-  sampler->SetTexture(texture);
+  camera->Position = glm::vec3(-5,2,15);
 
   CreateObject();
+  CreateInstances();
 
   bool quit = false;
   unsigned int prevTime = 0;
@@ -179,12 +208,9 @@ static void Init(const std::string& title, int width, int height, bool fullScree
   LOG("Vendor: %s\n", glGetString(GL_VENDOR));
   LOG("Renderer: %s\n", glGetString(GL_RENDERER));
 
-  glClearColor(0, 0, 0, 1);
-  glClearDepth(1.0);
-  glEnable(GL_DEPTH_TEST);
-  glDepthFunc(GL_LESS);
+  ForceClearState(device.clearState);
+  ForceRenderState(device.renderState);
 
-  SDL_GetMouseState(&oldMousePos.x, &oldMousePos.y);
   SDL_SetRelativeMouseMode(SDL_TRUE);
 }
 
@@ -242,18 +268,31 @@ static void CreateObject()
     { glm::vec3( 1.0f, 1.0f, 1.0f), glm::vec2(0.0f, 1.0f) }
   };
 
-  glGenVertexArrays(1, &vao);
-  glBindVertexArray(vao);
+  woodenCrate = boost::make_shared<ModelAsset>();
 
-  vertexBuffer = boost::make_shared<VertexBuffer>(sizeof(vertices), GL_STATIC_DRAW);
-  vertexBuffer->Enable();
-  vertexBuffer->SetData(vertices, sizeof(vertices), 0);
+  woodenCrate->drawType = GL_TRIANGLES;
+  woodenCrate->drawFirstVertex = 0;
+  woodenCrate->drawVertexCount = sizeof(vertices) / sizeof(vertices[0]);
 
-  glEnableVertexAttribArray(shader->GetAttributeIndex("Position"));
-  glVertexAttribPointer(shader->GetAttributeIndex("Position"), 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(Vertex, position));
+  glGenVertexArrays(1, &woodenCrate->vao);
+  glBindVertexArray(woodenCrate->vao);
 
-  glEnableVertexAttribArray(shader->GetAttributeIndex("TextureCoord"));
-  glVertexAttribPointer(shader->GetAttributeIndex("TextureCoord"), 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(Vertex, textureCoord));
+  woodenCrate->vertexBuffer = boost::make_shared<VertexBuffer>(sizeof(vertices), GL_STATIC_DRAW);
+  woodenCrate->vertexBuffer->Enable();
+  woodenCrate->vertexBuffer->SetData(vertices, sizeof(vertices), 0);
+
+  woodenCrate->shader = boost::make_shared<Shader>("shaders/textured");
+
+  woodenCrate->sampler = boost::make_shared<Sampler2D>();
+
+  woodenCrate->texture = boost::make_shared<Texture2D>("images/wooden-crate.jpg");
+  woodenCrate->texture->Load();
+
+  glEnableVertexAttribArray(woodenCrate->shader->GetAttributeIndex("Position"));
+  glVertexAttribPointer(woodenCrate->shader->GetAttributeIndex("Position"), 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(Vertex, position));
+
+  glEnableVertexAttribArray(woodenCrate->shader->GetAttributeIndex("TextureCoord"));
+  glVertexAttribPointer(woodenCrate->shader->GetAttributeIndex("TextureCoord"), 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(Vertex, textureCoord));
 
   VertexBuffer::Disable();
   glBindVertexArray(0);
@@ -292,9 +331,6 @@ static void Update(unsigned int elapsedMS)
   // update the camera and set the various shader uniforms accordingly...
   {
     camera->Update();
-    globalUniforms.CameraPos = glm::vec4(camera->Position, 1);
-    globalUniforms.ViewMatrix = camera->ViewMatrix;
-    globalUniforms.ProjectionMatrix = camera->PerspectiveMatrix;
   }
 
   // update the object(s)...
@@ -302,37 +338,167 @@ static void Update(unsigned int elapsedMS)
     const float rotationsPerSecond = 90.0f;
     rotation += rotationsPerSecond * elapsedSeconds;
     if (rotation > 360.0f) { rotation -= 360.0f; }
-    globalUniforms.WorldMatrix = glm::rotate(glm::mat4(1), rotation, glm::vec3(0,1,0));
-  }
-
-  // compute "automatic" shader uniforms...
-  {
-    globalUniforms.InverseViewMatrix = glm::inverse(globalUniforms.ViewMatrix);
-    globalUniforms.WorldViewMatrix = globalUniforms.ViewMatrix * globalUniforms.WorldMatrix;
-    globalUniforms.ViewProjectionMatrix = globalUniforms.ProjectionMatrix * globalUniforms.ViewMatrix;
-    globalUniforms.WorldViewProjectionMatrix = globalUniforms.ViewProjectionMatrix * globalUniforms.WorldMatrix;
+    instances.front()->transform = glm::rotate(glm::mat4(1), rotation, glm::vec3(0,1,0));
   }
 }
 
 //-----------------------------------------------------
 static void Render()
 {
+  RenderState renderState;
+
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   uniformBuffer->Enable();
-  uniformBuffer->SetData(&globalUniforms, sizeof(globalUniforms), 0);
+  globalUniforms.CameraPos = glm::vec4(camera->Position, 1);
+  globalUniforms.ViewMatrix = camera->ViewMatrix;
+  globalUniforms.ProjectionMatrix = camera->PerspectiveMatrix;
+  globalUniforms.InverseViewMatrix = glm::inverse(globalUniforms.ViewMatrix);
 
-  shader->Use();
-  sampler->Activate();
+  BOOST_FOREACH(boost::shared_ptr<ModelInstance> instance, instances)
+  {
+    renderState.vao = instance->asset->vao;
+    renderState.shader = instance->asset->shader;
 
-  glBindVertexArray(vao);
+    renderState.textureUnits[0].active = true;
+    renderState.textureUnits[0].sampler = instance->asset->sampler;
+    renderState.textureUnits[0].texture = instance->asset->texture;
 
-  glDrawArrays(GL_TRIANGLES, 0, 6 * 3 * 2);
-  
-  Texture2D::Deactivate();
-  glBindVertexArray(0);
-  glUseProgram(0);
+    globalUniforms.WorldMatrix = instance->transform;
+
+    globalUniforms.WorldViewMatrix = globalUniforms.ViewMatrix * globalUniforms.WorldMatrix;
+    globalUniforms.ViewProjectionMatrix = globalUniforms.ProjectionMatrix * globalUniforms.ViewMatrix;
+    globalUniforms.WorldViewProjectionMatrix = globalUniforms.ViewProjectionMatrix * globalUniforms.WorldMatrix;
+
+    uniformBuffer->SetData(&globalUniforms, sizeof(globalUniforms), 0);
+
+    ApplyTextureUnits(renderState.textureUnits, device.renderState.textureUnits);
+    ApplyShader(renderState.shader, device.renderState);
+    ApplyVAO(renderState.vao, device.renderState);
+
+    glDrawArrays(instance->asset->drawType, instance->asset->drawFirstVertex, instance->asset->drawVertexCount);
+  }
 
   SDL_GL_SwapWindow(mainWindow);
 }
 
+//-----------------------------------------------------
+static void CreateInstances()
+{
+  boost::shared_ptr<ModelInstance> instance;
+
+  /* dot over the 'i'*/
+  instance = boost::make_shared<ModelInstance>();
+  instance->asset = woodenCrate;
+  instance->transform = glm::mat4();
+  instances.push_back(instance);
+
+  /* i */
+  instance = boost::make_shared<ModelInstance>();
+  instance->asset = woodenCrate;
+  instance->transform = glm::translate(0.0f, -4.0f, 0.0f) * glm::scale(1.0f, 2.0f, 1.0f);
+  instances.push_back(instance);
+
+  /* left arm of H */
+  instance = boost::make_shared<ModelInstance>();
+  instance->asset = woodenCrate;
+  instance->transform = glm::translate(-8.0f, 0.0f, 0.0f) * glm::scale(1.0f, 6.0f, 1.0f);
+  instances.push_back(instance);
+
+  /* right arm of H */
+  instance = boost::make_shared<ModelInstance>();
+  instance->asset = woodenCrate;
+  instance->transform = glm::translate(-4.0f, 0.0f, 0.0f) * glm::scale(1.0f, 6.0f, 1.0f);
+  instances.push_back(instance);
+
+  /* middle bar of H */
+  instance = boost::make_shared<ModelInstance>();
+  instance->asset = woodenCrate;
+  instance->transform = glm::translate(-6.0f, 0.0f, 0.0f) * glm::scale(2.0f, 1.0f, 0.8f);
+  instances.push_back(instance);
+}
+
+//-----------------------------------------------------
+static void ForceRenderState(const RenderState& state)
+{
+  glColorMask(state.colourMask.r, state.colourMask.g, state.colourMask.b, state.colourMask.a);
+  glDepthMask(state.depthMask);
+  
+  if (state.depthTestEnabled)
+  {
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(state.depthFunc);
+  }
+  else
+  {
+    glDisable(GL_DEPTH_TEST);
+  }
+
+  if (state.enableCulling)
+  {
+    glEnable(GL_CULL_FACE);
+    glCullFace(state.cullFace);
+    glFrontFace(state.frontFace);
+  }
+  else
+  {
+    glDisable(GL_CULL_FACE);
+  }
+
+  for (size_t i = 0; i < RenderState::MaxTextureUnits; ++i)
+  {
+    glActiveTexture(GL_TEXTURE0 + i);
+    Sampler2D::Unbind(i);
+  }
+}
+
+//-----------------------------------------------------
+static void ForceClearState(const ClearState& state)
+{
+  glClearColor(state.colour.r, state.colour.g, state.colour.b, state.colour.a);
+  glClearDepth(state.depth);
+}
+
+//-----------------------------------------------------
+static void ApplyVAO(GLuint updated, RenderState& state)
+{
+  if (updated != state.vao)
+  {
+    state.vao = updated;
+    glBindVertexArray(state.vao);
+  }
+}
+
+//-----------------------------------------------------
+static void ApplyShader(boost::shared_ptr<Shader> shader, RenderState& state)
+{
+  if (state.shader != shader)
+  {
+    state.shader = shader;
+    state.shader->Use();
+  }
+  state.shader->ApplyUniforms();
+}
+
+//-----------------------------------------------------
+static void ApplyTextureUnits(TextureUnit updated[], TextureUnit current[])
+{
+  for (size_t i = 0; i < RenderState::MaxTextureUnits; ++i)
+  {
+    if (current[i] != updated[i])
+    {
+      glActiveTexture(GL_TEXTURE0 + i);
+      if (updated[i].active)
+      {
+        if (updated[i].texture != current[i].texture) { updated[i].texture->Activate(); }
+        if (updated[i].sampler != current[i].sampler) { updated[i].sampler->Bind(i); }
+      }
+      else
+      {
+        Sampler2D::Unbind(i);
+      }
+
+      current[i] = updated[i];
+    }
+  }
+}
